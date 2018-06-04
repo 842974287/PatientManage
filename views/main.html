@@ -1,0 +1,13 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <form action="/searchByName" method="get">
+        <p>
+            患者姓名：
+            <input name="name"/>
+        </p>
+        <p>
+            <input class="btn btn-primary" type="submit" value="提交"/>
+        </p>
+    </form>
+{% endblock %}

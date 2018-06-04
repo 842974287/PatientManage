@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <form action="/addNewPatient" method="post">
+        <div class="form-group">
+            <label class="col-sm-2 control-label">患者姓名：</label>
+            <input name="name" class="form-control" value="{{ name }}"/>
+        </div>
+        <div class="form-group">
+            <input name="gender" type="radio" value="男性"/>男性
+            <span>&nbsp &nbsp &nbsp &nbsp</span>
+            <input name="gender" type="radio" value="女性"/>女性
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">出生年月：</label>
+            <input name="birthdate" placeholder="mm/yyyy"/>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">电话号码：</label>
+            <input name="telephone"/>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="提交"/>
+        </div>
+    </form>
+{% endblock %}

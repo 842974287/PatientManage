@@ -1,0 +1,31 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="styleSheet" type="text/css" href="/css/jquery.dataTables.min.css">
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/js/dataTable_setup.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="col-md-10">
+        <div class="panel-body">
+            <table id="dataTable" class="table">
+                <thead>
+                    <td>姓名</td>
+                    <td>性别</td>
+                    <td>年龄</td>
+                </thead>
+                <tbody>
+                        <tr>
+                            <td><a href="patientDetail?_id={{ patient._id }}">{{ patient.name }}</a></td>
+                            <td>{{ patient.gender }}</td>
+                            <td>{{ patient.age }}</td>
+                        </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
