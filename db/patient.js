@@ -6,9 +6,12 @@ const db = require('./db');
 const patientSchema = new Schema({
     name: String,
     gender: String,
-    birthDate: String,
-    diagnosis: [String],
-    treatment: [String]
+    birthDate: Number,
+    birthPlace: String,
+    phoneNumber: String,
+    firstAttackDate: Number,
+    currentDiagnosis: [String],
+    currentTreatment: [String]
 }, {
     versionKey: false
 });
