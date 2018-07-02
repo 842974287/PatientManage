@@ -10,22 +10,36 @@
 {% endblock %}
 
 {% block content %}
-    <div class="col-md-10">
-        <div class="panel-body">
-            <table id="dataTable" class="table">
-                <thead>
-                    <td>姓名</td>
-                    <td>性别</td>
-                    <td>年龄</td>
-                </thead>
-                <tbody>
-                        <tr>
-                            <td><a href="patientDetail?_id={{ patient._id }}">{{ patient.name }}</a></td>
-                            <td>{{ patient.gender }}</td>
-                            <td>{{ patient.age }}</td>
-                        </tr>
-                </tbody>
-            </table>
-        </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">姓名：</label>
+        <span>{{ patient.name }}</span>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">性别：</label>
+        <span>{{ patient.gender }}</span>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">年龄：</label>
+        <span>{{ patient.age }}</span>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">籍贯：</label>
+        <span>{{ patient.birthPlace }}</span>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">电话号码：</label>
+        <span>{{ patient.phoneNumber }}</span>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">发病时间：</label>
+        <span>{{ patient.firstAttackDate }}</span>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">诊断：</label>
+        <span>{{ patient.diagnosis }}</span>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">用药：</label>
+        <span>{{ patient.diagnosis }}</span>
     </div>
 {% endblock %}

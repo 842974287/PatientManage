@@ -4,20 +4,31 @@
     <form action="/addNewPatient" method="post">
         <div class="form-group">
             <label class="col-sm-2 control-label">患者姓名：</label>
-            <input name="name" class="form-control" value="{{ name }}"/>
+            <input name="name" value="{{ name }}"/>
         </div>
-        <div class="form-group">
-            <input name="gender" type="radio" value="男性"/>男性
+        <div class="form-group form-check-inline">
             <span>&nbsp &nbsp &nbsp &nbsp</span>
-            <input name="gender" type="radio" value="女性"/>女性
+            <input class="form-check-input" name="gender" type="radio" value="男性"/>
+            <label class="form-check-label">男性</label>
+            <span>&nbsp &nbsp &nbsp &nbsp</span>
+            <input class="form-check-input" name="gender" type="radio" value="女性"/>
+            <label class="form-check-label">女性</label>
         </div>
         <div class="form-group">
             <label class="col-sm-2 control-label">出生年月：</label>
-            <input name="birthdate" placeholder="mm/yyyy"/>
+            <input name="birthDate" placeholder="yyyymmdd"/>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">籍贯：</label>
+            <input name="birthPlace"/>
         </div>
         <div class="form-group">
             <label class="col-sm-2 control-label">电话号码：</label>
-            <input name="telephone"/>
+            <input name="phoneNumber"/>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">发病时间：</label>
+            <input name="firstAttackDate" placeholder="yyyymmdd"/>
         </div>
         <div class="form-group">
             <input class="btn btn-primary" type="submit" value="提交"/>

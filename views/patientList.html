@@ -10,24 +10,33 @@
 {% endblock %}
 
 {% block content %}
-    <div class="col-md-10">
-        <div class="panel-body">
-            <table id="dataTable" class="table">
-                <thead>
-                    <td>姓名</td>
-                    <td>性别</td>
-                    <td>年龄</td>
-                </thead>
-                <tbody>
-                    {% for patient in patients %}
-                        <tr>
-                            <td><a href="patientDetail?_id={{ patient._id }}">{{ patient.name }}</a></td>
-                            <td>{{ patient.gender }}</td>
-                            <td>{{ patient.age }}</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
+    <div>
+        <a href="patientForm?name={{ patients[0].name }}" role="button" class="btn btn-success">添加新病人</a>
+    </div>
+    <div>
+        <table id="dataTable" class="table">
+            <thead>
+                <td>姓名</td>
+                <td>性别</td>
+                <td>出生年月</td>
+                <td>籍贯</td>
+                <td>电话号码</td>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                    <tr>
+                        <td>
+                            <a href="patientDetail?_id={{ patient._id }}">
+                                {{ patient.name }}
+                            </a>
+                        </td>
+                        <td>{{ patient.gender }}</td>
+                        <td>{{ patient.birthDate }}</td>
+                        <td>{{ patient.birthPlace }}</td>
+                        <td>{{ patient.phoneNumber }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 {% endblock %}

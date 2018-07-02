@@ -11,7 +11,12 @@ const patientSchema = new Schema({
     phoneNumber: String,
     firstAttackDate: Number,
     currentDiagnosis: [String],
-    currentTreatment: [String]
+    currentTreatments: [{
+        treatment: String,
+        day: Number,
+        time: Number,
+        amount: Number,
+    }],
 }, {
     versionKey: false
 });

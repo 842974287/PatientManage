@@ -7,7 +7,7 @@ const path = require('path');
 const Koa = require('koa');
 const app = module.exports = new Koa();
 
-const router = require('./routes/router')
+const router = require('./router')
 
 // middleware
 

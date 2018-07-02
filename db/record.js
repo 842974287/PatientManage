@@ -4,9 +4,16 @@ const Schema = mongoose.Schema;
 const db = require('./db');
 
 const recordSchema = new Schema({
-    date: 
+    date: Number,
+    patientID: Schema.Types.ObjectId,
     diagnosis: [String],
-    treatment: [String]
+    treatments: [{
+        treatment: String,
+        day: Number,
+        time: Number,
+        amount: Number,
+    }],
+    note: String,
 }, {
     versionKey: false
 });
