@@ -18,7 +18,7 @@ const patientSchema = new Schema({
         amount: Number,
     }],
 }, {
-    versionKey: false
+    versionKey: false,
 });
 
 const Patient = db.model('Patient', patientSchema);

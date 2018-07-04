@@ -19,7 +19,6 @@ async function showMainPage(ctx) {
 }
 
 async function searchByName(ctx) {
-    console.log(ctx.request);
     let patients = await Patient.find({name: ctx.query.name}).sort('birthDate');
 
     if (patients.length) {
@@ -74,16 +73,30 @@ async function addNewRecord(ctx) {
 
     if (recordInfo.hasOwnProperty('treatment')) {
         let treatments = [];
-        for (let i = 0; i < recordInfo.treatment.length; i++) {
+
+        if (typeof recordInfo.treatment == 'string') {
             let t = {};
 
-            t.treatment = recordInfo.treatment[i];
-            t.day = recordInfo.day[i];
-            t.time = recordInfo.time[i];
-            t.amount = recordInfo.amount[i];
+            t.treatment = recordInfo.treatment;
+            t.day = recordInfo.day;
+            t.time = recordInfo.time;
+            t.amount = recordInfo.amount;
 
             treatments.push(t);
         }
+        else {
+            for (let i = 0; i < recordInfo.treatment.length; i++) {
+                let t = {};
+
+                t.treatment = recordInfo.treatment[i];
+                t.day = recordInfo.day[i];
+                t.time = recordInfo.time[i];
+                t.amount = recordInfo.amount[i];
+
+                treatments.push(t);
+            }
+        }
+
         newRecord.treatments = treatments;
         patient.currentTreatments = treatments;
     }
@@ -101,7 +114,7 @@ async function showPatientDetail(ctx) {
 
     await ctx.render('patientDetail', {
         patient: opt.generatePatient(patient),
-        records: records,
+        records: opt.generateRecordList(records),
     });
 }
 

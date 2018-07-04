@@ -10,6 +10,9 @@
 {% endblock %}
 
 {% block content %}
+    <div>
+        <a href="/recordForm?id={{ patient._id }}&name={{ patient.name }}" role="button" class="btn btn-success">添加门诊记录</a>
+    </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">姓名：</label>
         <span>{{ patient.name }}</span>
@@ -38,8 +41,43 @@
         <label class="col-sm-2 control-label">诊断：</label>
         <span>{{ patient.diagnosis }}</span>
     </div>
-    <div class="form-group">
+    <div class="form-group" style="display: flex">
         <label class="col-sm-2 control-label">用药：</label>
-        <span>{{ patient.diagnosis }}</span>
+        <div class="list-group">
+            {% for treatment in patient.treatments %}
+                <p class="list-group-item">
+                    {{ treatment.treatment }}，{{ treatment.day }}日{{ treatment.time }}次，{{ treatment.amount }}片/次
+                </p>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="form-group" style="display: flex">
+        <label class="col-sm-2 control-label">门诊记录：</label>
+        <div class="list-group">
+            {% for record in records %}
+                <div class="list-group-item flex-column align-items-start">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">{{ record.date }}</h5>
+                    </div>
+                    <h7>诊断：</h7>
+                    <small>{{ record.diagnosis }}</small>
+                    {% if record.treatments %}
+                        <p>
+                            <h7>用药：</h7>
+                            {% for treatment in record.treatments %}
+                                <small class="list-group-item">
+                                    {{ treatment.treatment }}，{{ treatment.day }}日{{ treatment.time }}次，{{ treatment.amount }}片/次
+                                </small>
+                            {% endfor %}
+                        </p>
+                    {% endif %}
+                    {% if record.note %}
+                        <p>备注：</p>
+                        <small class="mb-1">{{ record.note }}</small>
+                    {% endif %}
+                </div>
+                <br>
+            {% endfor %}
+        </div>
     </div>
 {% endblock %}

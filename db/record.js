@@ -15,7 +15,7 @@ const recordSchema = new Schema({
     }],
     note: String,
 }, {
-    versionKey: false
+    versionKey: false,
 });
 
 const Record = db.model('Record', recordSchema);
