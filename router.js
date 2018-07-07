@@ -74,7 +74,12 @@ async function addNewRecord(ctx) {
     if (recordInfo.hasOwnProperty('newDiagnosis')) {
         configs.addDiagnosis(recordInfo.newDiagnosis);
 
-        recordInfo.diagnosis.append(recordInfo.newDiagnosis);
+        if (recordInfo.hasOwnProperty('diagnosis')) {
+            recordInfo.diagnosis.push(recordInfo.newDiagnosis);
+        }
+        else {
+            recordInfo.diagnosis = recordInfo.newDiagnosis;
+        }
     }
 
     newRecord.diagnosis = recordInfo.diagnosis;
@@ -108,6 +113,7 @@ async function addNewRecord(ctx) {
             treatmentNumber = recordInfo.newTreatment.length;
         }
     }
+
     if (recordInfo.hasOwnProperty('treatment')) {
         if (typeof recordInfo.treatment == 'string') {
             let t = {};

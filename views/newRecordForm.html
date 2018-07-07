@@ -18,7 +18,7 @@
                 {% for d in diagnosis %}
                 <option value="{{ d }}">{{ d }}</option>
                 {% endfor %}
-                <option value="addNew" onclick="addNewDiagnosis(this)">添加新诊断</option>
+                <option value="addNew">添加新诊断</option>
             </select>
             <button class="btn btn-danger" type="button" onclick="deleteDiv(this)">删除</button>
         </div>
@@ -29,7 +29,7 @@
                 {% for d in diagnosis %}
                 <option value="{{ d }}">{{ d }}</option>
                 {% endfor %}
-                <option>添加新诊断</option>
+                <option value="addNew">添加新诊断</option>
             </select>
             <button class="btn btn-danger" type="button" style="visibility: hidden">删除</button>
         </div>
@@ -42,7 +42,7 @@
                 {% for t in treatment %}
                 <option value="{{ t }}">{{ t }}</option>
                 {% endfor %}
-                <option>添加新诊断</option>
+                <option value="addNew">添加新用药</option>
             </select>
             <div class="form-group">
                 <input type="number" name="day" disabled/>天

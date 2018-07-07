@@ -29,23 +29,25 @@ function deleteDiv(node) {
 }
 
 function addNewDiagnosis(node) {
-    if (node.options[selectedIndex].value != 'addNew') {
+    if (node.options[node.selectedIndex].value != 'addNew') {
         return;
     }
 
-    var input = $("<input name='newDiagnosis'/>");
+    var input = document.createElement("INPUT");
+    input.name = "newDiagnosis";
 
-    node.before(input);
-    node.remoce();
+    node.parentNode.insertBefore(input, node);
+    node.remove();
 }
 
 function addNewTreatment(node) {
-    if (node.options[selectedIndex].value != 'addNew') {
+    if (node.options[node.selectedIndex].value != 'addNew') {
         return;
     }
-    
-    var input = $("<input name='newTreatment'/>");
 
-    node.before(input);
-    node.remoce();
+    var input = document.createElement("INPUT");
+    input.name = "newTreatment";
+
+    node.parentNode.insertBefore(input, node);
+    node.remove();
 }
