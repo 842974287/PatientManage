@@ -27,3 +27,25 @@ function addTreatment() {
 function deleteDiv(node) {
     node.parentElement.remove();
 }
+
+function addNewDiagnosis(node) {
+    if (node.options[selectedIndex].value != 'addNew') {
+        return;
+    }
+
+    var input = $("<input name='newDiagnosis'/>");
+
+    node.before(input);
+    node.remoce();
+}
+
+function addNewTreatment(node) {
+    if (node.options[selectedIndex].value != 'addNew') {
+        return;
+    }
+    
+    var input = $("<input name='newTreatment'/>");
+
+    node.before(input);
+    node.remoce();
+}

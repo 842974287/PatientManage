@@ -63,24 +63,59 @@ async function addNewRecord(ctx) {
     recordInfo = ctx.request.body;
     let patientID = mongoose.Types.ObjectId(recordInfo.id);
     let patient = await Patient.findById(patientID);
+    let treatments = [];
+    let treatmentNumber = 0;
 
     newRecord = new Record();
     newRecord.date = opt.normalizeDate();
     newRecord.patientID = patientID;
     newRecord.note = recordInfo.note;
+
+    if (recordInfo.hasOwnProperty('newDiagnosis')) {
+        configs.addDiagnosis(recordInfo.newDiagnosis);
+
+        recordInfo.diagnosis.append(recordInfo.newDiagnosis);
+    }
+
     newRecord.diagnosis = recordInfo.diagnosis;
     patient.currentDiagnosis = recordInfo.diagnosis;
 
-    if (recordInfo.hasOwnProperty('treatment')) {
-        let treatments = [];
+    if (recordInfo.hasOwnProperty('newTreatment')) {
+        configs.addTreatment(recordInfo.newTreatment);
 
+        if (typeof recordInfo.newTreatment == 'string') {
+            let t = {};
+
+            t.treatment = recordInfo.newTreatment;
+            t.day = recordInfo.day[treatmentNumber];
+            t.time = recordInfo.time[treatmentNumber];
+            t.amount = recordInfo.amount[treatmentNumber++];
+
+            treatments.push(t);
+        }
+        else {
+            for (let i = 0; i < recordInfo.newTreatment.length; i++) {
+                let t = {};
+
+                t.treatment = recordInfo.newTreatment[i];
+                t.day = recordInfo.day[i];
+                t.time = recordInfo.time[i];
+                t.amount = recordInfo.amount[i];
+
+                treatments.push(t);
+            }
+
+            treatmentNumber = recordInfo.newTreatment.length;
+        }
+    }
+    if (recordInfo.hasOwnProperty('treatment')) {
         if (typeof recordInfo.treatment == 'string') {
             let t = {};
 
             t.treatment = recordInfo.treatment;
-            t.day = recordInfo.day;
-            t.time = recordInfo.time;
-            t.amount = recordInfo.amount;
+            t.day = recordInfo.day[treatmentNumber];
+            t.time = recordInfo.time[treatmentNumber];
+            t.amount = recordInfo.amount[treatmentNumber];
 
             treatments.push(t);
         }
@@ -89,17 +124,17 @@ async function addNewRecord(ctx) {
                 let t = {};
 
                 t.treatment = recordInfo.treatment[i];
-                t.day = recordInfo.day[i];
-                t.time = recordInfo.time[i];
-                t.amount = recordInfo.amount[i];
+                t.day = recordInfo.day[i + treatmentNumber];
+                t.time = recordInfo.time[i + treatmentNumber];
+                t.amount = recordInfo.amount[i + treatmentNumber];
 
                 treatments.push(t);
             }
         }
-
-        newRecord.treatments = treatments;
-        patient.currentTreatments = treatments;
     }
+
+    newRecord.treatments = treatments;
+    patient.currentTreatments = treatments;
 
     await newRecord.save();
     await patient.save();
