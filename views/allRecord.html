@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="styleSheet" type="text/css" href="/css/jquery.dataTables.min.css">
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/js/dataTable_setup.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div>
+        <table id="allRecord" class="table">
+            <thead>
+                <td>就诊时间</td>
+                <td>姓名</td>
+                <td>诊断</td>
+                <td>用药</td>
+                <td>备注</td>
+            </thead>
+            <tbody>
+                {% for record in records %}
+                    <tr>
+                        <td>{{ record.date }}</td>
+                        <td>
+                            <a href="patientDetail?_id={{ record.patientID }}">
+                                {{ record.patientName }}
+                            </a>
+                        </td>
+                        <td>{{ record.diagnosis }}</td>
+                        <td>{{ record.briefTreatments }}</td>
+                        <td>{{ record.note }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

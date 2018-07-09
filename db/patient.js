@@ -10,6 +10,7 @@ const patientSchema = new Schema({
     birthPlace: String,
     phoneNumber: String,
     firstAttackDate: Number,
+    briefTreatments: [String],
     currentDiagnosis: [String],
     currentTreatments: [{
         treatment: String,

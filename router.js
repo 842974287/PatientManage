@@ -7,6 +7,8 @@ const Patient = require('./db/patient');
 const Record = require('./db/record');
 
 router.get('/', showMainPage)
+    .get('/allPatient', showAllPatient)
+    .get('/allRecord', showAllRecord)
     .get('/searchByName', searchByName)
     .get('/patientForm', showPatientForm)
     .post('/addNewPatient', addNewPatient)
@@ -18,13 +20,23 @@ async function showMainPage(ctx) {
     await ctx.render('main');
 }
 
+async function showAllPatient(ctx) {
+    let patients = await Patient.find();
+
+    await ctx.render('allPatient', { patients: opt.generatePatientList(patients) });
+}
+
+async function showAllRecord(ctx) {
+    let records = await Record.find();
+
+    await ctx.render('allRecord', { records: opt.generateRecordList(records) });
+}
+
 async function searchByName(ctx) {
-    let patients = await Patient.find({name: ctx.query.name}).sort('birthDate');
+    let patients = await Patient.find({ name: ctx.query.name }).sort('birthDate');
 
     if (patients.length) {
-        let patientList = opt.generatePatientList(patients);
-
-        await ctx.render('patientList', {patients: patientList});
+        await ctx.render('patientList', { patients: opt.generatePatientList(patients) });
     }
     else {
         await ctx.redirect(encodeURI('/patientForm?name=' + ctx.query.name));
@@ -32,7 +44,7 @@ async function searchByName(ctx) {
 }
 
 async function showPatientForm(ctx) {
-    await ctx.render('newPatientForm', {name: ctx.query.name });
+    await ctx.render('newPatientForm', { name: ctx.query.name });
 }
 
 async function addNewPatient(ctx) {
@@ -64,11 +76,13 @@ async function addNewRecord(ctx) {
     let patientID = mongoose.Types.ObjectId(recordInfo.id);
     let patient = await Patient.findById(patientID);
     let treatments = [];
+    let briefTreatments = [];
     let treatmentNumber = 0;
 
     newRecord = new Record();
     newRecord.date = opt.normalizeDate();
     newRecord.patientID = patientID;
+    newRecord.patientName = patient.name;
     newRecord.note = recordInfo.note;
 
     if (recordInfo.hasOwnProperty('newDiagnosis')) {
@@ -97,6 +111,7 @@ async function addNewRecord(ctx) {
             t.amount = recordInfo.amount[treatmentNumber++];
 
             treatments.push(t);
+            briefTreatments.push(recordInfo.newTreatment);
         }
         else {
             for (let i = 0; i < recordInfo.newTreatment.length; i++) {
@@ -108,6 +123,7 @@ async function addNewRecord(ctx) {
                 t.amount = recordInfo.amount[i];
 
                 treatments.push(t);
+                briefTreatments.push(recordInfo.newTreatment);
             }
 
             treatmentNumber = recordInfo.newTreatment.length;
@@ -124,6 +140,7 @@ async function addNewRecord(ctx) {
             t.amount = recordInfo.amount[treatmentNumber];
 
             treatments.push(t);
+            briefTreatments.push(recordInfo.treatment);
         }
         else {
             for (let i = 0; i < recordInfo.treatment.length; i++) {
@@ -135,12 +152,15 @@ async function addNewRecord(ctx) {
                 t.amount = recordInfo.amount[i + treatmentNumber];
 
                 treatments.push(t);
+                briefTreatments.push(recordInfo.treatment[i]);
             }
         }
     }
 
     newRecord.treatments = treatments;
+    newRecord.briefTreatments = briefTreatments;
     patient.currentTreatments = treatments;
+    patient.briefTreatments = briefTreatments;
 
     await newRecord.save();
     await patient.save();

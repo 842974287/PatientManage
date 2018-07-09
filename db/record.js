@@ -6,7 +6,9 @@ const db = require('./db');
 const recordSchema = new Schema({
     date: Number,
     patientID: Schema.Types.ObjectId,
+    patientName: String,
     diagnosis: [String],
+    briefTreatments: [String],
     treatments: [{
         treatment: String,
         day: Number,
