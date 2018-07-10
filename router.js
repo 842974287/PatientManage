@@ -77,7 +77,6 @@ async function addNewRecord(ctx) {
     let patient = await Patient.findById(patientID);
     let treatments = [];
     let briefTreatments = [];
-    let treatmentNumber = 0;
 
     newRecord = new Record();
     newRecord.date = opt.normalizeDate();
@@ -86,10 +85,18 @@ async function addNewRecord(ctx) {
     newRecord.note = recordInfo.note;
 
     if (recordInfo.hasOwnProperty('newDiagnosis')) {
+        if (typeof recordInfo.newDiagnosis == 'string') {
+            recordInfo.newDiagnosis = recordInfo.newDiagnosis.split(' ');
+        }
+
         configs.addDiagnosis(recordInfo.newDiagnosis);
 
         if (recordInfo.hasOwnProperty('diagnosis')) {
-            recordInfo.diagnosis.push(recordInfo.newDiagnosis);
+            if (typeof recordInfo.diagnosis == 'string') {
+                recordInfo.diagnosis = recordInfo.diagnosis.split(' ');
+            }
+
+            recordInfo.diagnosis = recordInfo.diagnosis.concat(recordInfo.newDiagnosis);
         }
         else {
             recordInfo.diagnosis = recordInfo.newDiagnosis;
@@ -99,61 +106,42 @@ async function addNewRecord(ctx) {
     newRecord.diagnosis = recordInfo.diagnosis;
     patient.currentDiagnosis = recordInfo.diagnosis;
 
-    if (recordInfo.hasOwnProperty('newTreatment')) {
-        configs.addTreatment(recordInfo.newTreatment);
+    if (recordInfo.hasOwnProperty('newTreatments')) {
+        if (typeof recordInfo.newTreatments == 'string') {
+            recordInfo.newTreatments = recordInfo.newTreatments.split(' ');
+        }
 
-        if (typeof recordInfo.newTreatment == 'string') {
+        configs.addTreatment(recordInfo.newTreatments);
+        briefTreatments = briefTreatments.concat(recordInfo.newTreatments);
+
+        for (let i = 0; i < recordInfo.newTreatments.length; i++) {
             let t = {};
 
-            t.treatment = recordInfo.newTreatment;
-            t.day = recordInfo.day[treatmentNumber];
-            t.time = recordInfo.time[treatmentNumber];
-            t.amount = recordInfo.amount[treatmentNumber++];
+            t.treatment = recordInfo.newTreatments[i];
+            t.day = recordInfo.newDay[i];
+            t.time = recordInfo.newTime[i];
+            t.amount = recordInfo.newAmount[i];
 
             treatments.push(t);
-            briefTreatments.push(recordInfo.newTreatment);
-        }
-        else {
-            for (let i = 0; i < recordInfo.newTreatment.length; i++) {
-                let t = {};
-
-                t.treatment = recordInfo.newTreatment[i];
-                t.day = recordInfo.day[i];
-                t.time = recordInfo.time[i];
-                t.amount = recordInfo.amount[i];
-
-                treatments.push(t);
-                briefTreatments.push(recordInfo.newTreatment);
-            }
-
-            treatmentNumber = recordInfo.newTreatment.length;
         }
     }
 
-    if (recordInfo.hasOwnProperty('treatment')) {
-        if (typeof recordInfo.treatment == 'string') {
+    if (recordInfo.hasOwnProperty('treatments')) {
+        if (typeof recordInfo.treatments == 'string') {
+            recordInfo.treatments = recordInfo.treatments.split(' ');
+        }
+
+        briefTreatments = briefTreatments.concat(recordInfo.treatments);
+
+        for (let i = 0; i < recordInfo.treatments.length; i++) {
             let t = {};
 
-            t.treatment = recordInfo.treatment;
-            t.day = recordInfo.day[treatmentNumber];
-            t.time = recordInfo.time[treatmentNumber];
-            t.amount = recordInfo.amount[treatmentNumber];
+            t.treatment = recordInfo.treatments[i];
+            t.day = recordInfo.day[i];
+            t.time = recordInfo.time[i];
+            t.amount = recordInfo.amount[i];
 
             treatments.push(t);
-            briefTreatments.push(recordInfo.treatment);
-        }
-        else {
-            for (let i = 0; i < recordInfo.treatment.length; i++) {
-                let t = {};
-
-                t.treatment = recordInfo.treatment[i];
-                t.day = recordInfo.day[i + treatmentNumber];
-                t.time = recordInfo.time[i + treatmentNumber];
-                t.amount = recordInfo.amount[i + treatmentNumber];
-
-                treatments.push(t);
-                briefTreatments.push(recordInfo.treatment[i]);
-            }
         }
     }
 

@@ -46,7 +46,12 @@ function addNewTreatment(node) {
     }
 
     var input = document.createElement("INPUT");
-    input.name = "newTreatment";
+    input.name = "newTreatments";
+
+    var inputs = node.parentNode.getElementsByTagName("input");
+    inputs[0].name = "newDay";
+    inputs[1].name = "newTime";
+    inputs[2].name = "newAmount";
 
     node.parentNode.insertBefore(input, node);
     node.remove();

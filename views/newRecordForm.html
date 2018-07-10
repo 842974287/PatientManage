@@ -38,7 +38,7 @@
         </div>
         <div class="treatment-default" style="display: none">
             <label class="col-sm-2 control-label">用药：</label>
-            <select class="custom-select" name="treatment" onchange="addNewTreatment(this)" disabled>
+            <select class="custom-select" name="treatments" onchange="addNewTreatment(this)" disabled>
                 {% for t in treatment %}
                 <option value="{{ t }}">{{ t }}</option>
                 {% endfor %}
