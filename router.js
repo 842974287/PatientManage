@@ -1,12 +1,17 @@
 const router = require('koa-router')();
 const mongoose = require('mongoose');
+const fs = require('fs');
+const path = require('path');
 const configs = require('./lib/configs');
 const opt = require('./lib/opt');
 
+const User = require('./db/user');
 const Patient = require('./db/patient');
 const Record = require('./db/record');
 
-router.get('/', showMainPage)
+router.get('/', showLoginPage)
+    .post('/login', login)
+    .get('/main', showMainPage)
     .get('/allPatient', showAllPatient)
     .get('/allRecord', showAllRecord)
     .get('/searchByName', searchByName)
@@ -14,21 +19,61 @@ router.get('/', showMainPage)
     .post('/addNewPatient', addNewPatient)
     .get('/recordForm', showRecordForm)
     .post('/addNewRecord', addNewRecord)
+    .post('/uploadFile', uploadFile)
     .get('/patientDetail', showPatientDetail);
 
+async function showLoginPage(ctx) {
+    await ctx.render('login');
+}
+
+async function login(ctx) {
+    userInfo = ctx.request.body;
+    user = await User.findOne({ 'username': userInfo.username });
+
+    if (user) {
+        if (user.password === userInfo.password) {
+            ctx.session.userRole = user.role;
+
+            await ctx.redirect('/main');
+        }
+        else {
+            ctx.body = { 'msg': '密码错误' };
+        }
+    }
+    else {
+        ctx.body = { 'msg': '用户不存在' };
+    }
+}
+
 async function showMainPage(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
     await ctx.render('main');
 }
 
 async function showAllPatient(ctx) {
-    let patients = await Patient.find();
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+    else if (ctx.session.userRole != 1) {
+        await ctx.redirect('/');
+    }
 
+    let patients = await Patient.find();
     await ctx.render('allPatient', { patients: opt.generatePatientList(patients) });
 }
 
 async function showAllRecord(ctx) {
-    let records = await Record.find();
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+    else if (ctx.session.userRole != 1) {
+        await ctx.redirect('/');
+    }
 
+    let records = await Record.find();
     await ctx.render('allRecord', { records: opt.generateRecordList(records) });
 }
 
@@ -44,6 +89,10 @@ async function searchByName(ctx) {
 }
 
 async function showPatientForm(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
     await ctx.render('newPatientForm', { name: ctx.query.name });
 }
 
@@ -63,6 +112,10 @@ async function addNewPatient(ctx) {
 }
 
 async function showRecordForm(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
     await ctx.render('newRecordForm', {
         name: ctx.query.name,
         id: ctx.query.id,
@@ -153,10 +206,23 @@ async function addNewRecord(ctx) {
     await newRecord.save();
     await patient.save();
 
-    await ctx.redirect('/');
+    await ctx.redirect('/main');
+}
+
+async function uploadFile(ctx) {
+    const file = ctx.request.body.files.file;
+    const reader = fs.createReadStream(file.path);
+    const stream = fs.createWriteStream(path.join(process.cwd(), '/photo/' + file.name));
+    reader.pipe(stream);
+
+    await ctx.redirect(ctx.request.header.referer);
 }
 
 async function showPatientDetail(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
     let patientID = mongoose.Types.ObjectId(ctx.query._id)
     let patient = await Patient.findById(patientID);
     let records = await Record.find({patientID: patientID}).sort('-date');

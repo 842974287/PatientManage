@@ -1,14 +1,5 @@
 {% extends 'layout.html' %}
 
-{% block css %}
-    <link rel="styleSheet" type="text/css" href="/css/jquery.dataTables.min.css">
-{% endblock %}
-
-{% block script %}
-    <script type="text/javascript" src="/js/jquery.dataTables.min.js"></script>
-    <script type="text/javascript" src="/js/dataTable_setup.js"></script>
-{% endblock %}
-
 {% block content %}
     <div>
         <a href="/recordForm?id={{ patient._id }}&name={{ patient.name }}" role="button" class="btn btn-success">添加门诊记录</a>
@@ -50,6 +41,13 @@
                 </p>
             {% endfor %}
         </div>
+    </div>
+    <div class="form-group">
+        <label class="col-sm-2 control-label">相关图片：</label>
+        <form action="/uploadFile" method="post" enctype="multipart/form-data">
+            <input type="file" name="file" multiple>
+            <input type="submit" value="upload">
+        </form>
     </div>
     <div class="form-group" style="display: flex">
         <label class="col-sm-2 control-label">门诊记录：</label>

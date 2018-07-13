@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
-const Schema = mongoose.Schema;
-
 const db = require('./db');
+
+const Schema = mongoose.Schema;
 
 const recordSchema = new Schema({
     date: Number,
@@ -10,6 +10,7 @@ const recordSchema = new Schema({
     diagnosis: [String],
     briefTreatments: [String],
     treatments: [{
+        _id: false,
         treatment: String,
         day: Number,
         time: Number,
