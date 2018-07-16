@@ -106,6 +106,7 @@ async function addNewPatient(ctx) {
     newPatient.birthPlace = patientInfo.birthPlace;
     newPatient.phoneNumber = patientInfo.phoneNumber;
     newPatient.firstAttackDate = patientInfo.firstAttackDate;
+    newPatient.photo = [];
     await newPatient.save();
 
     await ctx.redirect(encodeURI('/recordForm?id=' + newPatient._id.toString() + '&name=' + newPatient.name));
@@ -210,11 +211,20 @@ async function addNewRecord(ctx) {
 }
 
 async function uploadFile(ctx) {
-    const file = ctx.request.body.files.file;
-    const reader = fs.createReadStream(file.path);
-    const stream = fs.createWriteStream(path.join(process.cwd(), '/photo/' + file.name));
-    reader.pipe(stream);
+    const files = ctx.request.body.files.file;
+    let patient = await Patient.findById(mongoose.Types.ObjectId(ctx.request.body.fields.patientID));
 
+    for (let key in files) {
+        let file = files[key];
+        let filename = Date.now().toString() + path.extname(file.name);
+        let reader = fs.createReadStream(file.path);
+        let stream = fs.createWriteStream(path.join(process.cwd(), 'photo', filename));
+        reader.pipe(stream);
+
+        patient.photos.push(filename);
+    }
+
+    await patient.save();
     await ctx.redirect(ctx.request.header.referer);
 }
 
