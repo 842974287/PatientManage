@@ -20,7 +20,9 @@ router.get('/', showLoginPage)
     .get('/recordForm', showRecordForm)
     .post('/addNewRecord', addNewRecord)
     .post('/uploadFile', uploadFile)
-    .get('/patientDetail', showPatientDetail);
+    .get('/patientDetail', showPatientDetail)
+    .get('/modifyPatient', modifyPatient)
+    .get('modifyRecord', modifyRecord);
 
 async function showLoginPage(ctx) {
     await ctx.render('login');
@@ -214,14 +216,26 @@ async function uploadFile(ctx) {
     const files = ctx.request.body.files.file;
     let patient = await Patient.findById(mongoose.Types.ObjectId(ctx.request.body.fields.patientID));
 
-    for (let key in files) {
-        let file = files[key];
-        let filename = Date.now().toString() + path.extname(file.name);
-        let reader = fs.createReadStream(file.path);
-        let stream = fs.createWriteStream(path.join(process.cwd(), 'photo', filename));
-        reader.pipe(stream);
+    if (!files.length) {
+        if (files.size) {
+            let filename = Date.now().toString() + path.extname(files.name);
+            let reader = fs.createReadStream(files.path);
+            let stream = fs.createWriteStream(path.join(process.cwd(), 'photo', filename));
+            reader.pipe(stream);
 
-        patient.photos.push(filename);
+            patient.photos.push(filename);
+        }
+    }
+    else {
+        for (let key in files) {
+            let file = files[key];
+            let filename = Date.now().toString() + path.extname(file.name);
+            let reader = fs.createReadStream(file.path);
+            let stream = fs.createWriteStream(path.join(process.cwd(), 'photo', filename));
+            reader.pipe(stream);
+
+            patient.photos.push(filename);
+        }
     }
 
     await patient.save();
@@ -238,9 +252,32 @@ async function showPatientDetail(ctx) {
     let records = await Record.find({patientID: patientID}).sort('-date');
 
     await ctx.render('patientDetail', {
+        userRole: ctx.session.userRole,
         patient: opt.generatePatient(patient),
         records: opt.generateRecordList(records),
     });
+}
+
+async function modifyPatient(ctx) {
+    if (ctx.session.userRole != 1) {
+        await ctx.redirect('/main');
+    }
+
+    let patientID = mongoose.Types.ObjectId(ctx.query._id)
+    let patient = await Patient.findById(patientID);
+
+    await ctx.render('modifyPatient', { patient: opt.generatePatient(patient) });
+}
+
+async function modifyRecord(ctx) {
+    if (ctx.session.userRole != 1) {
+        await ctx.redirect('/main');
+    }
+
+    let recordID = mongoose.Types.ObjectId(ctx.query._id)
+    let record = await Record.findById(recordID);
+
+    await ctx.render('modifyRecord', { record: opt.generateRecord(record) });
 }
 
 module.exports = router;
