@@ -1,0 +1,101 @@
+{% extends 'layout.html' %}
+
+{% block script %}
+    <script type="text/javascript" src="/js/recordForm.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div class="form-group">
+        <label class="col-sm-2 control-label">病人姓名：</label>
+        <span>{{ record.patientName }}</span>
+    </div>
+    <form action="/modifyRecord" method="post">
+        <input name="patientID" value="{{ patientID }}" style="display: none"/>
+        <input name="recordID" value="{{ recordID }}" style="display: none"/>
+        {% for dg in record.diagnosis %}
+            <div class="diagnosis input-group-prepend">
+                <label class="col-sm-2 control-label">诊断：</label>
+                <select class="custom-select" name="diagnosis" onchange="addNewDiagnosis(this)">
+                    <option value="不明">不明</option>
+                    {% for d in diagnosis %}
+                        {% if d === dg %}
+                            <option value="{{ d }}" selected>{{ d }}</option>
+                        {% else %}
+                            <option value="{{ d }}">{{ d }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    <option value="addNew">添加新诊断</option>
+                </select>
+                {% if loop.first %}
+                    <button class="btn btn-danger" type="button" style="visibility: hidden">删除</button>
+                {% else %}
+                    <button class="btn btn-danger" type="button" onclick="deleteDiv(this)">删除</button>
+                {% endif %}
+            </div>
+        {% endfor %}
+        <div class="addDiagnosis form-group">
+            <button class="btn btn-success" type="button" onclick="addDiagnosis()">添加诊断</button>
+        </div>
+        {% for tr in record.treatments %}
+            <div class="treatment input-group-prepend">
+                <label class="col-sm-2 control-label">用药：</label>
+                <select class="custom-select" name="treatments" onchange="addNewTreatment(this)">
+                    {% for t in treatment %}
+                        {% if t === tr.treatment %}
+                            <option value="{{ t }}" selected>{{ t }}</option>
+                        {% else %}
+                            <option value="{{ t }}">{{ t }}</option>
+                        {% endif %}
+                    {% endfor %}
+                    <option value="addNew">添加新用药</option>
+                </select>
+                <div class="form-group">
+                    <input type="number" name="day" value="{{ tr.day }}"/>天
+                    <span>&nbsp &nbsp</span>
+                    <input type="number" name="time" value="{{ tr.time }}"/>次
+                    <span>&nbsp &nbsp</span>
+                    <input name="amount" value="{{ tr.amount }}"/>片/次
+                </div>
+                <button class="form-group btn btn-danger" type="button" onclick="deleteDiv(this)">删除</button>
+            </div>
+        {% endfor %}
+        <div class="addTreatment form-group">
+            <button class="btn btn-success" type="button" onclick="addTreatment()">添加用药</button>
+        </div>
+        <div class="form-group">
+            <label>备注</label>
+            <textarea class="form-control" name="note" rows="3">{{ record.note }}</textarea>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="提交"/>
+        </div>
+    </form>
+    <div class="diagnosis-default" style="display: none">
+        <label class="col-sm-2 control-label">诊断：</label>
+        <select class="custom-select" name="diagnosis" onchange="addNewDiagnosis(this)">
+            <option value="不明">不明</option>
+            {% for d in diagnosis %}
+            <option value="{{ d }}">{{ d }}</option>
+            {% endfor %}
+            <option value="addNew">添加新诊断</option>
+        </select>
+        <button class="btn btn-danger" type="button" onclick="deleteDiv(this)">删除</button>
+    </div>
+    <div class="treatment-default" style="display: none">
+        <label class="col-sm-2 control-label">用药：</label>
+        <select class="custom-select" name="treatments" onchange="addNewTreatment(this)">
+            {% for t in treatment %}
+            <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+            <option value="addNew">添加新用药</option>
+        </select>
+        <div class="form-group">
+            <input type="number" name="day" value="0"/>天
+            <span>&nbsp &nbsp</span>
+            <input type="number" name="time" value="0"/>次
+            <span>&nbsp &nbsp</span>
+            <input name="amount" value="0"/>片/次
+        </div>
+        <button class="form-group btn btn-danger" type="button" onclick="deleteDiv(this)">删除</button>
+    </div>
+{% endblock %}

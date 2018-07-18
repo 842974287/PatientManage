@@ -11,17 +11,6 @@
     </div>
     <form action="/addNewRecord" method="post">
         <input name="id" value="{{ id }}" style="display: none"/>
-        <div class="diagnosis-default" style="display: none">
-            <label class="col-sm-2 control-label">诊断：</label>
-            <select class="custom-select" name="diagnosis" onchange="addNewDiagnosis(this)" disabled>
-                <option value="不明">不明</option>
-                {% for d in diagnosis %}
-                <option value="{{ d }}">{{ d }}</option>
-                {% endfor %}
-                <option value="addNew">添加新诊断</option>
-            </select>
-            <button class="btn btn-danger" type="button" onclick="deleteDiv(this)">删除</button>
-        </div>
         <div class="diagnosis input-group-prepend">
             <label class="col-sm-2 control-label">诊断：</label>
             <select class="custom-select" name="diagnosis" onchange="addNewDiagnosis(this)">
@@ -36,23 +25,6 @@
         <div class="addDiagnosis form-group">
             <button class="btn btn-success" type="button" onclick="addDiagnosis()">添加诊断</button>
         </div>
-        <div class="treatment-default" style="display: none">
-            <label class="col-sm-2 control-label">用药：</label>
-            <select class="custom-select" name="treatments" onchange="addNewTreatment(this)" disabled>
-                {% for t in treatment %}
-                <option value="{{ t }}">{{ t }}</option>
-                {% endfor %}
-                <option value="addNew">添加新用药</option>
-            </select>
-            <div class="form-group">
-                <input type="number" name="day" disabled/>天
-                <span>&nbsp &nbsp</span>
-                <input type="number" name="time" disabled/>次
-                <span>&nbsp &nbsp</span>
-                <input type="number" name="amount" disabled/>片/次
-            </div>
-            <button class="form-group btn btn-danger" type="button" onclick="deleteDiv(this)">删除</button>
-        </div>
         <div class="addTreatment form-group">
             <button class="btn btn-success" type="button" onclick="addTreatment()">添加用药</button>
         </div>
@@ -64,4 +36,32 @@
             <input class="btn btn-primary" type="submit" value="提交"/>
         </div>
     </form>
+    <div class="diagnosis-default" style="display: none">
+        <label class="col-sm-2 control-label">诊断：</label>
+        <select class="custom-select" name="diagnosis" onchange="addNewDiagnosis(this)">
+            <option value="不明">不明</option>
+            {% for d in diagnosis %}
+            <option value="{{ d }}">{{ d }}</option>
+            {% endfor %}
+            <option value="addNew">添加新诊断</option>
+        </select>
+        <button class="btn btn-danger" type="button" onclick="deleteDiv(this)">删除</button>
+    </div>
+    <div class="treatment-default" style="display: none">
+        <label class="col-sm-2 control-label">用药：</label>
+        <select class="custom-select" name="treatments" onchange="addNewTreatment(this)">
+            {% for t in treatment %}
+            <option value="{{ t }}">{{ t }}</option>
+            {% endfor %}
+            <option value="addNew">添加新用药</option>
+        </select>
+        <div class="form-group">
+            <input type="number" name="day" value="0"/>天
+            <span>&nbsp &nbsp</span>
+            <input type="number" name="time" value="0"/>次
+            <span>&nbsp &nbsp</span>
+            <input name="amount" value="0"/>片/次
+        </div>
+        <button class="form-group btn btn-danger" type="button" onclick="deleteDiv(this)">删除</button>
+    </div>
 {% endblock %}

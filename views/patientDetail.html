@@ -2,7 +2,7 @@
 
 {% block content %}
     <div>
-        <a href="/recordForm?id={{ patient._id }}&name={{ patient.name }}" role="button" class="btn btn-success">添加门诊记录</a>
+        <a href="/recordForm?_id={{ patient._id }}&name={{ patient.name }}" role="button" class="btn btn-success">添加门诊记录</a>
     </div>
     <div class="form-group">
         <label class="col-sm-2 control-label">姓名：</label>
@@ -37,14 +37,23 @@
         <div class="list-group">
             {% for treatment in patient.treatments %}
                 <p class="list-group-item">
-                    {{ treatment.treatment }}，{{ treatment.day }}日{{ treatment.time }}次，{{ treatment.amount }}片/次
+                    {{ treatment.treatment }}，
+                    {% if treatment.day %}
+                        {{ treatment.day }}日
+                    {% endif %}
+                    {% if treatment.time %}
+                        {{ treatment.time }}次，
+                    {% endif %}
+                    {% if treatment.amount %}
+                        {{ treatment.amount }}片/次
+                    {% endif %}
                 </p>
             {% endfor %}
         </div>
     </div>
     {% if userRole == 1 %}
         <div class="form-group">
-            <a class="btn btn-info" role="button" href="/modifyPatient?id={{ patient._id }}">修改病人资料</a>
+            <a class="btn btn-info" role="button" href="/modifyPatient?_id={{ patient._id }}">修改病人资料</a>
         </div>
     {% endif %}
     <div class="form-group">
@@ -70,7 +79,16 @@
                             <h7>用药：</h7>
                             {% for treatment in record.treatments %}
                                 <small class="list-group-item">
-                                    {{ treatment.treatment }}，{{ treatment.day }}日{{ treatment.time }}次，{{ treatment.amount }}片/次
+                                    {{ treatment.treatment }}，
+                                    {% if treatment.day %}
+                                        {{ treatment.day }}日
+                                    {% endif %}
+                                    {% if treatment.time %}
+                                        {{ treatment.time }}次，
+                                    {% endif %}
+                                    {% if treatment.amount %}
+                                        {{ treatment.amount }}片/次
+                                    {% endif %}
                                 </small>
                             {% endfor %}
                         </p>
@@ -82,7 +100,7 @@
                     {% if userRole == 1 %}
                         <br>
                         <div class="form-group">
-                            <a class="btn btn-info" role="button" href="/modifyRecord?id={{ record._id }}">修改门诊记录</a>
+                            <a class="btn btn-info" role="button" href="/modifyRecord?_id={{ record._id }}">修改门诊记录</a>
                         </div>
                     {% endif %}
                 </div>

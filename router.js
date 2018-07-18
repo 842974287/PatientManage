@@ -10,19 +10,21 @@ const Patient = require('./db/patient');
 const Record = require('./db/record');
 
 router.get('/', showLoginPage)
-    .post('/login', login)
     .get('/main', showMainPage)
     .get('/allPatient', showAllPatient)
     .get('/allRecord', showAllRecord)
     .get('/searchByName', searchByName)
     .get('/patientForm', showPatientForm)
-    .post('/addNewPatient', addNewPatient)
     .get('/recordForm', showRecordForm)
+    .get('/patientDetail', showPatientDetail)
+    .get('/modifyPatient', showModifyPatientForm)
+    .get('/modifyRecord', showModifyRecordForm)
+    .post('/login', login)
+    .post('/addNewPatient', addNewPatient)
     .post('/addNewRecord', addNewRecord)
     .post('/uploadFile', uploadFile)
-    .get('/patientDetail', showPatientDetail)
-    .get('/modifyPatient', modifyPatient)
-    .get('modifyRecord', modifyRecord);
+    .post('/modifyPatient', modifyPatient)
+    .post('/modifyRecord', modifyRecord);
 
 async function showLoginPage(ctx) {
     await ctx.render('login');
@@ -111,7 +113,7 @@ async function addNewPatient(ctx) {
     newPatient.photo = [];
     await newPatient.save();
 
-    await ctx.redirect(encodeURI('/recordForm?id=' + newPatient._id.toString() + '&name=' + newPatient.name));
+    await ctx.redirect(encodeURI('/recordForm?_id=' + newPatient._id.toString() + '&name=' + newPatient.name));
 }
 
 async function showRecordForm(ctx) {
@@ -121,7 +123,7 @@ async function showRecordForm(ctx) {
 
     await ctx.render('newRecordForm', {
         name: ctx.query.name,
-        id: ctx.query.id,
+        id: ctx.query._id,
         diagnosis: configs.readDiagnosis(),
         treatment: configs.readTreatment(),
     });
@@ -247,9 +249,9 @@ async function showPatientDetail(ctx) {
         await ctx.redirect('/');
     }
 
-    let patientID = mongoose.Types.ObjectId(ctx.query._id)
+    let patientID = mongoose.Types.ObjectId(ctx.query._id);
     let patient = await Patient.findById(patientID);
-    let records = await Record.find({patientID: patientID}).sort('-date');
+    let records = await Record.find({ patientID: patientID }).sort('-date');
 
     await ctx.render('patientDetail', {
         userRole: ctx.session.userRole,
@@ -258,15 +260,55 @@ async function showPatientDetail(ctx) {
     });
 }
 
+async function showModifyPatientForm(ctx) {
+    if (ctx.session.userRole != 1) {
+        await ctx.redirect('/main');
+    }
+
+    let patientID = mongoose.Types.ObjectId(ctx.query._id);
+    let patient = await Patient.findById(patientID);
+
+    await ctx.render('modifyPatient', {
+        id: patient._id.toString(),
+        patient: patient,
+    });
+}
+
+async function showModifyRecordForm(ctx) {
+    if (ctx.session.userRole != 1) {
+        await ctx.redirect('/main');
+    }
+
+    let recordID = mongoose.Types.ObjectId(ctx.query._id);
+    let record = await Record.findById(recordID);
+
+    await ctx.render('modifyRecord', {
+        patientID: record.patientID.toString(),
+        recordID: record._id.toString(),
+        record: record,
+        diagnosis: configs.readDiagnosis(),
+        treatment: configs.readTreatment(),
+    });
+}
+
 async function modifyPatient(ctx) {
     if (ctx.session.userRole != 1) {
         await ctx.redirect('/main');
     }
 
-    let patientID = mongoose.Types.ObjectId(ctx.query._id)
+    let patientInfo = ctx.request.body;
+    let patientID = mongoose.Types.ObjectId(patientInfo.id);
     let patient = await Patient.findById(patientID);
 
-    await ctx.render('modifyPatient', { patient: opt.generatePatient(patient) });
+    patient.name = patientInfo.name;
+    patient.gender = patientInfo.gender;
+    patient.birthDate = patientInfo.birthDate;
+    patient.birthPlace = patientInfo.birthPlace;
+    patient.phoneNumber = patientInfo.phoneNumber;
+    patient.firstAttackDate = patientInfo.firstAttackDate;
+
+    await patient.save();
+    await ctx.redirect('./patientDetail?_id=' + patientInfo.id);
 }
 
 async function modifyRecord(ctx) {
@@ -274,10 +316,120 @@ async function modifyRecord(ctx) {
         await ctx.redirect('/main');
     }
 
-    let recordID = mongoose.Types.ObjectId(ctx.query._id)
-    let record = await Record.findById(recordID);
+    recordInfo = ctx.request.body;
+    let patientID = mongoose.Types.ObjectId(recordInfo.patientID);
+    let patient = await Patient.findById(patientID);
+    let record = await Record.findById(mongoose.Types.ObjectId(recordInfo.recordID))
+    let lastRecord = await Record.findOne({ 'patientID': patientID }).sort('-date');
+    let treatments = [];
+    let briefTreatments = [];
 
-    await ctx.render('modifyRecord', { record: opt.generateRecord(record) });
+    if (recordInfo.hasOwnProperty('newDiagnosis')) {
+        if (typeof recordInfo.newDiagnosis == 'string') {
+            recordInfo.newDiagnosis = recordInfo.newDiagnosis.split(' ');
+        }
+
+        configs.addDiagnosis(recordInfo.newDiagnosis);
+
+        if (recordInfo.hasOwnProperty('diagnosis')) {
+            if (typeof recordInfo.diagnosis == 'string') {
+                recordInfo.diagnosis = recordInfo.diagnosis.split(' ');
+            }
+
+            recordInfo.diagnosis = recordInfo.diagnosis.concat(recordInfo.newDiagnosis);
+        }
+        else {
+            recordInfo.diagnosis = recordInfo.newDiagnosis;
+        }
+    }
+
+    record.diagnosis = recordInfo.diagnosis;
+
+    if (recordInfo.hasOwnProperty('newTreatments')) {
+        if (typeof recordInfo.newTreatments == 'string') {
+            recordInfo.newTreatments = recordInfo.newTreatments.split(' ');
+        }
+
+        configs.addTreatment(recordInfo.newTreatments);
+        briefTreatments = briefTreatments.concat(recordInfo.newTreatments);
+
+        for (let i = 0; i < recordInfo.newTreatments.length; i++) {
+            let t = {};
+
+            t.treatment = recordInfo.newTreatments[i];
+            t.day = recordInfo.newDay[i];
+            t.time = recordInfo.newTime[i];
+            t.amount = recordInfo.newAmount[i];
+
+            treatments.push(t);
+        }
+    }
+
+    if (recordInfo.hasOwnProperty('treatments')) {
+        if (typeof recordInfo.treatments == 'string') {
+            recordInfo.treatments = recordInfo.treatments.split(' ');
+        }
+
+        briefTreatments = briefTreatments.concat(recordInfo.treatments);
+
+        for (let i = 0; i < recordInfo.treatments.length; i++) {
+            let t = {};
+
+            t.treatment = recordInfo.treatments[i];
+            t.day = recordInfo.day[i];
+            t.time = recordInfo.time[i];
+            t.amount = recordInfo.amount[i];
+
+            treatments.push(t);
+        }
+    }
+
+    record.treatments = treatments;
+    record.briefTreatments = briefTreatments;
+    record.note = recordInfo.note;
+
+    if (lastRecord._id.toString() == record._id.toString()) {
+        patient.currentDiagnosis = recordInfo.diagnosis;
+        patient.currentTreatments = treatments;
+        patient.briefTreatments = briefTreatments;
+    }
+
+    await record.save();
+    await patient.save();
+
+    await ctx.redirect('./patientDetail?_id=' + recordInfo.patientID);
+}
+
+async function deletePatient(ctx) {
+    if (ctx.session.userRole != 1) {
+        await ctx.redirect('/main');
+    }
+
+    let patientID = mongoose.Types.ObjectId(ctx.query._id);
+    let patientToDelete = await Patient.findByIdAndRemove(mongoose.Types.ObjectId(patientID));
+    let recordsToDelete = await Record.deleteMany({ 'patientID': patientID });
+
+    await ctx.redirect('/main');
+}
+
+async function deleteRecord(ctx) {
+    if (ctx.session.userRole != 1) {
+        await ctx.redirect('/main');
+    }
+
+    let recordID = mongoose.Types.ObjectId(ctx.query._id);
+    let recordToDelete = await Record.findByIdAndRemove(recordID);
+
+    let record = await Record.findOne({ 'patientID': record.patientID }).sort('-date');
+    let patient = await Patient.findById(record.patientID);
+
+    patient.currentDiagnosis = record.diagnosis;
+    patient.currentTreatments = record.treatments;
+    patient.briefTreatments = record.briefTreatments;
+
+    await patient.save();
+
+    await ctx.redirect('/main');
 }
 
 module.exports = router;

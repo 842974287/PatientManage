@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <form id="patientForm" action="/modifyPatient" method="post">
+        <input name="id" value="{{ id }}" style="display: none"/>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">患者姓名：</label>
+            <input name="name" value="{{ patient.name }}"/>
+        </div>
+        <div class="form-group form-check-inline">
+            <span>&nbsp &nbsp &nbsp &nbsp</span>
+            {% if patient.gender === "男性" %}
+                <input class="form-check-input" name="gender" type="radio" value="男性" checked/>
+                <label class="form-check-label">男性</label>
+                <span>&nbsp &nbsp &nbsp &nbsp</span>
+                <input class="form-check-input" name="gender" type="radio" value="女性"/>
+                <label class="form-check-label">女性</label>
+            {% elseif patient.gender === "女性" %}
+                <input class="form-check-input" name="gender" type="radio" value="男性"/>
+                <label class="form-check-label">男性</label>
+                <span>&nbsp &nbsp &nbsp &nbsp</span>
+                <input class="form-check-input" name="gender" type="radio" value="女性" checked/>
+                <label class="form-check-label">女性</label>
+            {% else %}
+                <input class="form-check-input" name="gender" type="radio" value="男性"/>
+                <label class="form-check-label">男性</label>
+                <span>&nbsp &nbsp &nbsp &nbsp</span>
+                <input class="form-check-input" name="gender" type="radio" value="女性"/>
+                <label class="form-check-label">女性</label>
+            {% endif %}
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">出生年月：</label>
+            <input class="date" name="birthDate" placeholder="yyyymmdd" value="{{ patient.birthDate }}"/>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">籍贯：</label>
+            <input name="birthPlace" value="{{ patient.birthPlace }}"/>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">电话号码：</label>
+            <input name="phoneNumber" value="{{ patient.phoneNumber }}"/>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">发病时间：</label>
+            <input class="date" name="firstAttackDate" placeholder="yyyymmdd" value="{{ patient.firstAttackDate }}"/>
+        </div>
+        <div class="alert">
+            <span class="text-warning" id="date"></span>
+        </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type="submit" value="提交"/>
+        </div>
+    </form>
+    <script>
+        $("#patientForm").submit(function(){
+            var date = $(".date");
+            if(date[0].value.length * date[1].value.length != 64){
+                $("#date").html("日期格式不符合规范");
+                return false;
+            }
+        })
+    </script>
+{% endblock %}
