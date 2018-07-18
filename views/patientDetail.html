@@ -54,6 +54,8 @@
     {% if userRole == 1 %}
         <div class="form-group">
             <a class="btn btn-info" role="button" href="/modifyPatient?_id={{ patient._id }}">修改病人资料</a>
+            <span>&nbsp &nbsp &nbsp &nbsp</span>
+            <a class="btn btn-danger" role="button" href="/deletePatient?_id={{ patient._id }}" onclick="return confirm('你将要删除该病人！')">删除</a>
         </div>
     {% endif %}
     <div class="form-group">
@@ -101,6 +103,9 @@
                         <br>
                         <div class="form-group">
                             <a class="btn btn-info" role="button" href="/modifyRecord?_id={{ record._id }}">修改门诊记录</a>
+                        </div>
+                        <div class="form-group">
+                            <a class="btn btn-danger" role="button" href="/deleteRecord?_id={{ record._id }}" onclick="return confirm('你将要删除该门诊记录！')">删除</a>
                         </div>
                     {% endif %}
                 </div>

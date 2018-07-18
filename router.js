@@ -19,6 +19,8 @@ router.get('/', showLoginPage)
     .get('/patientDetail', showPatientDetail)
     .get('/modifyPatient', showModifyPatientForm)
     .get('/modifyRecord', showModifyRecordForm)
+    .get('/deletePatient', deletePatient)
+    .get('/deleteRecord', deleteRecord)
     .post('/login', login)
     .post('/addNewPatient', addNewPatient)
     .post('/addNewRecord', addNewRecord)
@@ -420,16 +422,23 @@ async function deleteRecord(ctx) {
     let recordID = mongoose.Types.ObjectId(ctx.query._id);
     let recordToDelete = await Record.findByIdAndRemove(recordID);
 
-    let record = await Record.findOne({ 'patientID': record.patientID }).sort('-date');
-    let patient = await Patient.findById(record.patientID);
+    let record = await Record.findOne({ 'patientID': recordToDelete.patientID }).sort('-date');
+    let patient = await Patient.findById(recordToDelete.patientID);
 
-    patient.currentDiagnosis = record.diagnosis;
-    patient.currentTreatments = record.treatments;
-    patient.briefTreatments = record.briefTreatments;
+    if (record) {
+        patient.currentDiagnosis = record.diagnosis;
+        patient.currentTreatments = record.treatments;
+        patient.briefTreatments = record.briefTreatments;
+    }
+    else {
+        patient.currentDiagnosis = [];
+        patient.currentTreatments = [];
+        patient.briefTreatments = '';
+    }
 
     await patient.save();
 
-    await ctx.redirect('/main');
+    await ctx.redirect('/patientDetail?_id=' + patient._id.toString());
 }
 
 module.exports = router;
