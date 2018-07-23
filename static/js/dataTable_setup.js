@@ -15,6 +15,12 @@ $(document).ready( function () {
     });
 
     $('#allPatient').DataTable({
+        "serverSide": false,
+        "dom": "Bfrtip",
+        "buttons": [{
+                "extend": "excelHtml5",
+                "filename": "全部病人",
+        }],
         "language": {
             "paginate": {
                 "sNext": "下一页",
@@ -30,6 +36,12 @@ $(document).ready( function () {
     });
 
     $('#allRecord').DataTable({
+        "serverSide": false,
+        "dom": "Bfrtip",
+        "buttons": [{
+                "extend": "excelHtml5",
+                "filename": "全部记录",
+        }],
         "language": {
             "paginate": {
                 "sNext": "下一页",
@@ -41,6 +53,6 @@ $(document).ready( function () {
             "sSearch": "搜索",
             "sLengthMenu": "每页显示 _MENU_ 条记录",
             "sInfo": "当前显示 _START_ 到 _END_ 条，共 _TOTAL_ 条记录",
-      }
+      },
     });
 });
