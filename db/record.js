@@ -17,6 +17,8 @@ const recordSchema = new Schema({
         amount: Number,
     }],
     note: String,
+    doctorName: String,
+    userID: Schema.Types.ObjectId,
 }, {
     versionKey: false,
 });

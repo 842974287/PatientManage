@@ -20,6 +20,8 @@ const patientSchema = new Schema({
         time: Number,
         amount: Number,
     }],
+    doctorName: String,
+    userID: Schema.Types.ObjectId,
 }, {
     versionKey: false,
 });

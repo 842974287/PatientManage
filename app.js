@@ -31,6 +31,8 @@ app.use(session(app));
 
 app.use(server(path.join(__dirname, '/static')));
 
+app.use(server(path.join(__dirname, '/photo')));
+
 app.use(router.routes());
 
 app.listen(3001);

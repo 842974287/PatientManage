@@ -19,6 +19,9 @@
             <thead>
                 <td>就诊时间</td>
                 <td>姓名</td>
+                {% if userRole % 2 == 1 %}
+                    <td>诊断医生</td>
+                {% endif %}
                 <td>诊断</td>
                 <td>用药</td>
                 <td>备注</td>
@@ -32,6 +35,9 @@
                                 {{ record.patientName }}
                             </a>
                         </td>
+                        {% if userRole % 2 == 1 %}
+                            <td>{{ record.doctorName }}</td>
+                        {% endif %}
                         <td>{{ record.diagnosis }}</td>
                         <td>{{ record.briefTreatments }}</td>
                         <td>{{ record.note }}</td>

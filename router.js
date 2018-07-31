@@ -13,6 +13,7 @@ router.get('/', showLoginPage)
     .get('/main', showMainPage)
     .get('/allPatient', showAllPatient)
     .get('/allRecord', showAllRecord)
+    .get('/userForm', showNewUserForm)
     .get('/searchByName', searchByName)
     .get('/patientForm', showPatientForm)
     .get('/recordForm', showRecordForm)
@@ -24,6 +25,7 @@ router.get('/', showLoginPage)
     .post('/login', login)
     .post('/addNewPatient', addNewPatient)
     .post('/addNewRecord', addNewRecord)
+    .post('/addNewUser', addNewUser)
     .post('/uploadFile', uploadFile)
     .post('/modifyPatient', modifyPatient)
     .post('/modifyRecord', modifyRecord);
@@ -39,6 +41,8 @@ async function login(ctx) {
     if (user) {
         if (user.password === userInfo.password) {
             ctx.session.userRole = user.role;
+            ctx.session.userID = user._id;
+            ctx.session.doctorName = user.realName;
 
             await ctx.redirect('/main');
         }
@@ -56,38 +60,89 @@ async function showMainPage(ctx) {
         await ctx.redirect('/');
     }
 
-    await ctx.render('main');
+    await ctx.render('main', { userRole: ctx.session.userRole });
 }
 
 async function showAllPatient(ctx) {
     if (!ctx.session.userRole) {
         await ctx.redirect('/');
     }
-    else if (ctx.session.userRole != 1) {
-        await ctx.redirect('/');
-    }
+    else if (ctx.session.userRole == 2) {
+        let patients = await Patient.find({ userID: ctx.session.userID });
 
-    let patients = await Patient.find();
-    await ctx.render('allPatient', { patients: opt.generatePatientList(patients) });
+        await ctx.render('allPatient', {
+            patients: opt.generatePatientList(patients),
+            userRole: ctx.session.userRole,
+        });
+    }
+    else {
+        let patients = await Patient.find();
+
+        await ctx.render('allPatient', {
+            patients: opt.generatePatientList(patients),
+            userRole: ctx.session.userRole,
+        });
+    }
 }
 
 async function showAllRecord(ctx) {
     if (!ctx.session.userRole) {
         await ctx.redirect('/');
     }
-    else if (ctx.session.userRole != 1) {
-        await ctx.redirect('/');
+    else if (ctx.session.userRole == 2) {
+        let records = await Record.find({ userID: ctx.session.userID });
+
+        await ctx.render('allRecord', {
+            records: opt.generateRecordList(records),
+            userRole: ctx.session.userRole,
+        });
+    }
+    else {
+        let records = await Record.find();
+
+        await ctx.render('allRecord', {
+            records: opt.generateRecordList(records),
+            userRole: ctx.session.userRole,
+        });
+    }
+}
+
+async function showNewUserForm(ctx) {
+    if (ctx.session.userRole != 1) {
+        await ctx.redirect('/main');
     }
 
-    let records = await Record.find();
-    await ctx.render('allRecord', { records: opt.generateRecordList(records) });
+    await ctx.render('newUserForm', { userRole: ctx.session.userRole });
+}
+
+async function addNewUser(ctx) {
+    userInfo = ctx.request.body;
+
+    newUser = new User();
+    newUser.username = userInfo.username;
+    newUser.password = userInfo.password;
+    newUser.realName = userInfo.realName;
+    newUser.role = userInfo.userRole;
+    await newUser.save();
+
+    ctx.redirect('/main');
 }
 
 async function searchByName(ctx) {
+    if (!ctx.session.userRole) {
+        ctx.redirect('/');
+    }
+    else if (ctx.session.userRole == 3) {
+        ctx.redirect('/main');
+    }
+
     let patients = await Patient.find({ name: ctx.query.name }).sort('birthDate');
 
     if (patients.length) {
-        await ctx.render('patientList', { patients: opt.generatePatientList(patients) });
+        await ctx.render('patientList', {
+            patients: opt.generatePatientList(patients),
+            userRole: ctx.session.userRole,
+        });
     }
     else {
         await ctx.redirect(encodeURI('/patientForm?name=' + ctx.query.name));
@@ -96,10 +151,16 @@ async function searchByName(ctx) {
 
 async function showPatientForm(ctx) {
     if (!ctx.session.userRole) {
-        await ctx.redirect('/');
+        ctx.redirect('/');
+    }
+    else if (ctx.session.userRole == 3) {
+        ctx.redirect('/main');
     }
 
-    await ctx.render('newPatientForm', { name: ctx.query.name });
+    await ctx.render('newPatientForm', {
+        name: ctx.query.name,
+        userRole: ctx.session.userRole,
+    });
 }
 
 async function addNewPatient(ctx) {
@@ -113,6 +174,9 @@ async function addNewPatient(ctx) {
     newPatient.phoneNumber = patientInfo.phoneNumber;
     newPatient.firstAttackDate = patientInfo.firstAttackDate;
     newPatient.photo = [];
+    newPatient.doctorName = ctx.session.doctorName;
+    newPatient.userID = ctx.session.userID;
+
     await newPatient.save();
 
     await ctx.redirect(encodeURI('/recordForm?_id=' + newPatient._id.toString() + '&name=' + newPatient.name));
@@ -120,7 +184,10 @@ async function addNewPatient(ctx) {
 
 async function showRecordForm(ctx) {
     if (!ctx.session.userRole) {
-        await ctx.redirect('/');
+        ctx.redirect('/');
+    }
+    else if (ctx.session.userRole == 3) {
+        ctx.redirect('/main');
     }
 
     await ctx.render('newRecordForm', {
@@ -128,6 +195,7 @@ async function showRecordForm(ctx) {
         id: ctx.query._id,
         diagnosis: configs.readDiagnosis(),
         treatment: configs.readTreatment(),
+        userRole: ctx.session.userRole,
     });
 }
 
@@ -143,6 +211,8 @@ async function addNewRecord(ctx) {
     newRecord.patientID = patientID;
     newRecord.patientName = patient.name;
     newRecord.note = recordInfo.note;
+    newRecord.doctorName = ctx.session.doctorName;
+    newRecord.userID = ctx.session.userID;
 
     if (recordInfo.hasOwnProperty('newDiagnosis')) {
         if (typeof recordInfo.newDiagnosis == 'string') {
@@ -209,6 +279,8 @@ async function addNewRecord(ctx) {
     newRecord.briefTreatments = briefTreatments;
     patient.currentTreatments = treatments;
     patient.briefTreatments = briefTreatments;
+    patient.doctorName = newRecord.doctorName;
+    patient.userID = newRecord.userID;
 
     await newRecord.save();
     await patient.save();
@@ -273,6 +345,7 @@ async function showModifyPatientForm(ctx) {
     await ctx.render('modifyPatient', {
         id: patient._id.toString(),
         patient: patient,
+        userRole: ctx.session.userRole,
     });
 }
 
@@ -290,6 +363,7 @@ async function showModifyRecordForm(ctx) {
         record: record,
         diagnosis: configs.readDiagnosis(),
         treatment: configs.readTreatment(),
+        userRole: ctx.session.userRole,
     });
 }
 
@@ -429,6 +503,8 @@ async function deleteRecord(ctx) {
         patient.currentDiagnosis = record.diagnosis;
         patient.currentTreatments = record.treatments;
         patient.briefTreatments = record.briefTreatments;
+        patient.doctorName = record.doctorName;
+        patient.userID = record.userID;
     }
     else {
         patient.currentDiagnosis = [];

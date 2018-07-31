@@ -23,6 +23,9 @@
                 <td>籍贯</td>
                 <td>电话号码</td>
                 <td>发病时间</td>
+                {% if userRole % 2 == 1 %}
+                    <td>诊断医生</td>
+                {% endif %}
                 <td>诊断</td>
                 <td>用药</td>
             </thead>
@@ -39,6 +42,9 @@
                         <td>{{ patient.birthPlace }}</td>
                         <td>{{ patient.phoneNumber }}</td>
                         <td>{{ patient.firstAttackDate }}</td>
+                        {% if userRole % 2 == 1 %}
+                            <td>{{ patient.doctorName }}</td>
+                        {% endif %}
                         <td>{{ patient.diagnosis }}</td>
                         <td>{{ patient.briefTreatments }}</td>
                     </tr>

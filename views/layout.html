@@ -11,18 +11,22 @@
     </head>
     <body>
         {% block navbar %}
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
-            <div class="navbar-collapse">
-                <div class="navbar-nav">
-                  <a class="nav-item nav-link active" href="/main">开始记录</a>
-                  <a class="nav-item nav-link active" href="/allPatient">全部病人</a>
-                  <a class="nav-item nav-link active" href="/allRecord">全部记录</a>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark justify-content-between">
+                <div class="navbar-collapse">
+                    <div class="navbar-nav">
+                        {% if userRole != 3 %}
+                            <a class="nav-item nav-link active" href="/main">开始记录</a>
+                        {% endif %}
+                        <a class="nav-item nav-link active" href="/allPatient">全部病人</a>
+                        <a class="nav-item nav-link active" href="/allRecord">全部记录</a>
+                        {% if userRole == 1 %}
+                            <a class="nav-item nav-link active" href="/userForm">添加用户</a>
+                        {% endif %}
+                    </div>
                 </div>
-            </div>
-        </nav>
-        <br>
+            </nav>
+            <br>
         {% endblock %}
-        {% block content %}
-        {% endblock %}
+        {% block content %}{% endblock %}
     </body>
 </html>
