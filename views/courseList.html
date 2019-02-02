@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="styleSheet" type="text/css" href="/css/jquery.dataTables.min.css">
+    <link rel="styleSheet" type="text/css" href="/css/buttons.dataTables.min.css">
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="/js/jquery.dataTables.min.js"></script>
+    <script type="text/javascript" src="/js/dataTables.buttons.min.js"></script>
+    <script type="text/javascript" src="/js/jszip.min.js"></script>
+    <script type="text/javascript" src="/js/buttons.html5.min.js"></script>
+    <script type="text/javascript" src="/js/dataTable_setup.js"></script>
+{% endblock %}
+
+{% block content %}
+    <div>
+        <table id="allCourse" class="table">
+            <thead>
+                <td>课程</td>
+                <td>主讲人</td>
+                <td>简介</td>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                    <tr>
+                        <td>
+                            <a href="courseDetail?_id={{ course._id }}">
+                                {{ course.courseName }}
+                            </a>
+                        </td>
+                        <td>{{ course.instructorName }}</td>
+                        <td>{{ course.description }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+{% endblock %}

@@ -33,6 +33,8 @@ app.use(server(path.join(__dirname, '/static')));
 
 app.use(server(path.join(__dirname, '/photo')));
 
+app.use(server(path.join(__dirname, '/video')));
+
 app.use(router.routes());
 
 app.listen(3001);

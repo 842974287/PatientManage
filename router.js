@@ -8,11 +8,13 @@ const opt = require('./lib/opt');
 const User = require('./db/user');
 const Patient = require('./db/patient');
 const Record = require('./db/record');
+const Course = require('./db/course');
 
 router.get('/', showLoginPage)
     .get('/main', showMainPage)
     .get('/allPatient', showAllPatient)
     .get('/allRecord', showAllRecord)
+    .get('/courseList', showCourseList)
     .get('/userForm', showNewUserForm)
     .get('/searchByName', searchByName)
     .get('/patientForm', showPatientForm)
@@ -22,6 +24,7 @@ router.get('/', showLoginPage)
     .get('/modifyRecord', showModifyRecordForm)
     .get('/deletePatient', deletePatient)
     .get('/deleteRecord', deleteRecord)
+    .get('/courseDetail', showCourseDetail)
     .post('/login', login)
     .post('/addNewPatient', addNewPatient)
     .post('/addNewRecord', addNewRecord)
@@ -113,6 +116,20 @@ async function showNewUserForm(ctx) {
     }
 
     await ctx.render('newUserForm', { userRole: ctx.session.userRole });
+}
+
+async function showCourseList(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+    else {
+        let courses = await Course.find();
+
+        await ctx.render('courseList', {
+            courses: courses,
+            userRole: ctx.session.userRole,
+        });
+    }
 }
 
 async function addNewUser(ctx) {
@@ -515,6 +532,20 @@ async function deleteRecord(ctx) {
     await patient.save();
 
     await ctx.redirect('/patientDetail?_id=' + patient._id.toString());
+}
+
+async function showCourseDetail(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+    else {
+        let courses = await Course.find({ _id: ctx.query._id });
+
+        await ctx.render('courseList', {
+            courses: courses,
+            userRole: ctx.session.userRole,
+        });
+    }
 }
 
 module.exports = router;
