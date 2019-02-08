@@ -25,6 +25,7 @@ router.get('/', showLoginPage)
     .get('/deletePatient', deletePatient)
     .get('/deleteRecord', deleteRecord)
     .get('/courseDetail', showCourseDetail)
+    .get('/playVideo', playVideo)
     .post('/login', login)
     .post('/addNewPatient', addNewPatient)
     .post('/addNewRecord', addNewRecord)
@@ -126,7 +127,7 @@ async function showCourseList(ctx) {
         let courses = await Course.find();
 
         await ctx.render('courseList', {
-            courses: courses,
+            courses: opt.generateCourseList(courses),
             userRole: ctx.session.userRole,
         });
     }
@@ -539,12 +540,33 @@ async function showCourseDetail(ctx) {
         await ctx.redirect('/');
     }
     else {
-        let courses = await Course.find({ _id: ctx.query._id });
+        let courseID = mongoose.Types.ObjectId(ctx.query._id);
+        let course = await Course.find({ _id: courseID });
 
-        await ctx.render('courseList', {
-            courses: courses,
-            userRole: ctx.session.userRole,
+        await ctx.render('courseDetail', {
+            course: course[0],
+            fileName: course[0].videoList[0].fileName,
         });
+    }
+}
+
+async function playVideo(ctx) {
+    const fpath = 'video/sample.mp4';
+    const fstat = await new Promise(function(resolve, reject) {
+        fs.stat(fpath, function(err, stat) {
+            if (err) {
+                reject(err);
+            }
+            else {
+                resolve(stat);
+            }
+        });
+    });
+    const fileSize = fstat.size;
+    const range = ctx.req.headers.range;
+
+    if (range) {
+        const parts = range.replace
     }
 }
 

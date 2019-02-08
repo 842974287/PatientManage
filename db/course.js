@@ -17,6 +17,6 @@ const courseSchema = new Schema({
     versionKey: false,
 });
 
-const Course = db.model('Course', questionSchema);
+const Course = db.model('Course', courseSchema);
 
 module.exports = Course;
