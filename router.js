@@ -552,21 +552,33 @@ async function showCourseDetail(ctx) {
 
 async function playVideo(ctx) {
     const fpath = 'video/sample.mp4';
-    const fstat = await new Promise(function(resolve, reject) {
-        fs.stat(fpath, function(err, stat) {
-            if (err) {
-                reject(err);
-            }
-            else {
-                resolve(stat);
-            }
-        });
-    });
+    const fstat = fs.statSync(fpath)
     const fileSize = fstat.size;
     const range = ctx.req.headers.range;
-
+    console.log(range)
     if (range) {
-        const parts = range.replace
+        const parts = range.replace(/bytes=/, "").split("-")
+        const start = parseInt(parts[0], 10)
+        const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
+        const chunksize = (end - start) + 1
+        const file = fs.createReadStream(fpath, {start, end})
+
+        ctx.set('Content-Range', `bytes ${start}-${end}/${fileSize}`)
+        ctx.set('Accept-Ranges', 'bytes')
+        ctx.set('Content-Length', chunksize)
+        ctx.set('Content-Type', 'video/mp4')
+
+        ctx.status = 206;
+        ctx.body = file
+    }
+    else {
+        const head = {
+            'Content-Length': fileSize,
+            'Content-Type': 'video/mp4',
+        }
+
+        ctx.status = 200
+        ctx.body = fs.createReadStream(fpath)
     }
 }
 
