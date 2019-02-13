@@ -555,7 +555,7 @@ async function playVideo(ctx) {
     const fstat = fs.statSync(fpath)
     const fileSize = fstat.size;
     const range = ctx.req.headers.range;
-    console.log(range)
+
     if (range) {
         const parts = range.replace(/bytes=/, "").split("-")
         const start = parseInt(parts[0], 10)

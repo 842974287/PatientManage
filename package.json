@@ -1,5 +1,5 @@
 {
-  "name": "outpatient-service",
+  "name": "hospital-service",
   "version": "1.0.0",
   "description": "Managing the patients.",
   "main": "app.js",
