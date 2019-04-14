@@ -7,7 +7,7 @@ const userSchema = new Schema({
     username: { type: String, unique: true },
     password: String,
     realName: String,
-    role: Number, // admin: 1, inputer: 2, observer: 3
+    role: Number, // excel: 0, admin: 1, inputer: 2, observer: 3
 }, {
     versionKey: false,
 });

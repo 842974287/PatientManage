@@ -26,13 +26,15 @@ router.get('/', showLoginPage)
     .get('/deleteRecord', deleteRecord)
     .get('/courseDetail', showCourseDetail)
     .get('/playVideo', playVideo)
+    .get('/addCourse', addCourse)
     .post('/login', login)
     .post('/addNewPatient', addNewPatient)
     .post('/addNewRecord', addNewRecord)
     .post('/addNewUser', addNewUser)
     .post('/uploadFile', uploadFile)
     .post('/modifyPatient', modifyPatient)
-    .post('/modifyRecord', modifyRecord);
+    .post('/modifyRecord', modifyRecord)
+    .post('/admit', admit);
 
 async function showLoginPage(ctx) {
     await ctx.render('login');
@@ -47,8 +49,16 @@ async function login(ctx) {
             ctx.session.userRole = user.role;
             ctx.session.userID = user._id;
             ctx.session.doctorName = user.realName;
+            ctx.cookies.set(
+                'role',
+                user.role,
+                {
+                    httpOnly: false,  // 是否只用于http请求中获取
+                    overwrite: false  // 是否允许重写
+                }
+            )
 
-            await ctx.redirect('/main');
+            ctx.body = { 'msg': 'success' };
         }
         else {
             ctx.body = { 'msg': '密码错误' };
@@ -112,7 +122,10 @@ async function showAllRecord(ctx) {
 }
 
 async function showNewUserForm(ctx) {
-    if (ctx.session.userRole != 1) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+    else if (ctx.session.userRole > 1) {
         await ctx.redirect('/main');
     }
 
@@ -136,14 +149,21 @@ async function showCourseList(ctx) {
 async function addNewUser(ctx) {
     userInfo = ctx.request.body;
 
-    newUser = new User();
-    newUser.username = userInfo.username;
-    newUser.password = userInfo.password;
-    newUser.realName = userInfo.realName;
-    newUser.role = userInfo.userRole;
-    await newUser.save();
+    user = await User.findOne({ 'username': userInfo.username });
 
-    ctx.redirect('/main');
+    if (!user) {
+        newUser = new User();
+        newUser.username = userInfo.username;
+        newUser.password = userInfo.password;
+        newUser.realName = userInfo.realName;
+        newUser.role = userInfo.userRole;
+        await newUser.save();
+
+        ctx.redirect('/main');
+    }
+    else {
+        await ctx.render()
+    }
 }
 
 async function searchByName(ctx) {
@@ -194,6 +214,14 @@ async function addNewPatient(ctx) {
     newPatient.photo = [];
     newPatient.doctorName = ctx.session.doctorName;
     newPatient.userID = ctx.session.userID;
+
+    if (patientInfo.inqueue) {
+        newPatient.inqueue = true;
+
+        if (patientInfo.urgent) {
+            newPatient.urgent = true;
+        }
+    }
 
     await newPatient.save();
 
@@ -401,6 +429,14 @@ async function modifyPatient(ctx) {
     patient.phoneNumber = patientInfo.phoneNumber;
     patient.firstAttackDate = patientInfo.firstAttackDate;
 
+    if (patientInfo.inqueue) {
+        patient.inqueue = true;
+
+        if (patientInfo.urgent) {
+            patient.urgent = true;
+        }
+    }
+
     await patient.save();
     await ctx.redirect('./patientDetail?_id=' + patientInfo.id);
 }
@@ -550,6 +586,10 @@ async function showCourseDetail(ctx) {
     }
 }
 
+async function addCourse(ctx) {
+
+}
+
 async function playVideo(ctx) {
     const fpath = 'video/sample.mp4';
     const fstat = fs.statSync(fpath)
@@ -580,6 +620,18 @@ async function playVideo(ctx) {
         ctx.status = 200
         ctx.body = fs.createReadStream(fpath)
     }
+}
+
+async function admit(ctx) {
+    let patientID = mongoose.Types.ObjectId(ctx.request.body.patientID);
+    let patient = await Patient.findById(patientID);
+
+    patient.inqueue = false;
+    patient.urgent = false;
+
+    await patient.save();
+
+    ctx.body = { 'msg': 'success' };
 }
 
 module.exports = router;

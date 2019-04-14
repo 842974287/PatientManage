@@ -19,7 +19,7 @@
             <thead>
                 <td>就诊时间</td>
                 <td>姓名</td>
-                {% if userRole % 2 == 1 %}
+                {% if userRole != 2 %}
                     <td>诊断医生</td>
                 {% endif %}
                 <td>诊断</td>
@@ -35,7 +35,7 @@
                                 {{ record.patientName }}
                             </a>
                         </td>
-                        {% if userRole % 2 == 1 %}
+                        {% if userRole != 2 %}
                             <td>{{ record.doctorName }}</td>
                         {% endif %}
                         <td>{{ record.diagnosis }}</td>

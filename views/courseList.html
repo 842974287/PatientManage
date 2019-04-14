@@ -14,6 +14,11 @@
 {% endblock %}
 
 {% block content %}
+    {% if userRole == 1 %}
+    <div>
+        <a href="addCourse" role="button" class="btn btn-success">添加课程</a>
+    </div>
+    {% endif %}
     <div>
         <table id="allCourse" class="table">
             <thead>

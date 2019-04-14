@@ -1,4 +1,4 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
 
 {% block css %}
     <link rel="styleSheet" type="text/css" href="/css/jquery.dataTables.min.css">
@@ -18,16 +18,15 @@
         <table id="allPatient" class="table">
             <thead>
                 <td>姓名</td>
-                <td>性别</td>
-                <td>出生年月</td>
-                <td>籍贯</td>
+                <td>身份证号码</td>
                 <td>电话号码</td>
                 <td>发病时间</td>
-                {% if userRole % 2 == 1 %}
+                {% if userRole != 2 %}
                     <td>诊断医生</td>
                 {% endif %}
                 <td>诊断</td>
                 <td>用药</td>
+                <td>住院</td>
             </thead>
             <tbody>
                 {% for patient in patients %}
@@ -37,19 +36,43 @@
                                 {{ patient.name }}
                             </a>
                         </td>
-                        <td>{{ patient.gender }}</td>
-                        <td>{{ patient.birthDate }}</td>
-                        <td>{{ patient.birthPlace }}</td>
+                        <td>{{ patient.personalID }}</td>
                         <td>{{ patient.phoneNumber }}</td>
                         <td>{{ patient.firstAttackDate }}</td>
-                        {% if userRole % 2 == 1 %}
+                        {% if userRole != 2 %}
                             <td>{{ patient.doctorName }}</td>
                         {% endif %}
                         <td>{{ patient.diagnosis }}</td>
                         <td>{{ patient.briefTreatments }}</td>
+                        <td>
+                            {% if patient.inqueue == 1 %}
+                            <input id="{{ patient._id }}" class="admit btn btn-primary" value="入院"/>
+                            {% endif %}
+                        </td>
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
+    <script>
+        $(".admit").click(function() {
+            if(confirm("确认入院？")) {
+                $(".admit").prop("disabled", "disabled");
+                let btn = $(this);
+
+                $.ajax({
+    				url: "/admit/",
+    				type: "POST",
+    				dataType: "json",
+    				data: { "patientID": btn.attr("id") },
+    				success:function(callback){
+                        alert("入院成功");
+
+                        $(".admit").prop("disabled", "");
+                        btn.remove();
+    				}
+    			});
+            }
+        });
+    </script>
 {% endblock %}

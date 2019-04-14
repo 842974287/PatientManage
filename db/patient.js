@@ -5,12 +5,17 @@ const Schema = mongoose.Schema;
 
 const patientSchema = new Schema({
     name: String,
+    personalID: String,
     gender: String,
     birthDate: Number,
     birthPlace: String,
     phoneNumber: String,
     firstAttackDate: Number,
     photos: [String],
+    inqueue: { type: Boolean, default: false },
+    urgent: { type: Boolean, default: false },
+    inpatient: { type: Boolean, default: false },
+    reserveTime: Number,
     briefTreatments: [String],
     currentDiagnosis: [String],
     currentTreatments: [{

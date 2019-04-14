@@ -1,22 +1,30 @@
 {% extends 'layout.html' %}
 
+{% block script %}
+    <script type="text/javascript" src="/js/patientForm.js"></script>
+{% endblock %}
+
 {% block content %}
     <form id="patientForm" action="/addNewPatient" method="post">
         <div class="form-group">
             <label class="col-sm-2 control-label">患者姓名：</label>
             <input name="name" value="{{ name }}"/>
         </div>
+        <div class="form-group">
+            <label class="col-sm-2 control-label">身份证号码：</label>
+            <input id="IDnumber" name="IDnumber"/>
+        </div>
         <div class="form-group form-check-inline">
             <span>&nbsp &nbsp &nbsp &nbsp</span>
-            <input class="form-check-input" name="gender" type="radio" value="男性"/>
+            <input id="male" class="form-check-input" name="gender" type="radio" value="男性"/>
             <label class="form-check-label">男性</label>
             <span>&nbsp &nbsp &nbsp &nbsp</span>
-            <input class="form-check-input" name="gender" type="radio" value="女性"/>
+            <input id="female" class="form-check-input" name="gender" type="radio" value="女性"/>
             <label class="form-check-label">女性</label>
         </div>
         <div class="form-group">
             <label class="col-sm-2 control-label">出生年月：</label>
-            <input class="date" name="birthDate" placeholder="yyyymmdd"/>
+            <input id="birthDate" class="date" name="birthDate" placeholder="yyyymmdd"/>
         </div>
         <div class="form-group">
             <label class="col-sm-2 control-label">籍贯：</label>
@@ -30,20 +38,25 @@
             <label class="col-sm-2 control-label">发病时间：</label>
             <input class="date" name="firstAttackDate" placeholder="yyyymmdd"/>
         </div>
+        <div class="form-group">
+            <div>
+                <span>&nbsp &nbsp &nbsp &nbsp</span>
+                <input id="inqueue" name="inqueue" type="checkbox" value="inqueue" onclick="inqueueClick();"/>
+                <label class="form-check-label">需要住院</label>
+            </div>
+            <div id="urgent" style="display: none">
+                <span>&nbsp &nbsp &nbsp &nbsp</span>
+                <input name="urgent" type="checkbox" value="urgent"/>
+                <label class="form-check-label">需要加急</label>
+            </div>
+        </div>
         <div class="alert">
             <span class="text-warning" id="date"></span>
+            <br>
+            <span class="text-warning" id="id"></span>
         </div>
         <div class="form-group">
             <input class="btn btn-primary" type="submit" value="提交"/>
         </div>
     </form>
-    <script>
-        $("#patientForm").submit(function(){
-            var date = $(".date");
-            if(date[0].value.length * date[1].value.length != 64){
-                $("#date").html("日期格式不符合规范");
-                return false;
-            }
-        })
-    </script>
 {% endblock %}
