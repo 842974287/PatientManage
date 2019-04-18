@@ -56,6 +56,15 @@
         <div class="form-group">
             <div>
                 <span>&nbsp &nbsp &nbsp &nbsp</span>
+                {% if patient.favor %}
+                    <input id="favor" name="favor" type="checkbox" value="favor" checked/>
+                {% else %}
+                    <input id="favor" name="favor" type="checkbox" value="favor"/>
+                {% endif %}
+                <label class="form-check-label">打招呼</label>
+            </div>
+            <div>
+                <span>&nbsp &nbsp &nbsp &nbsp</span>
                 {% if patient.inqueue %}
                     <input id="inqueue" name="inqueue" type="checkbox" value="inqueue" onclick="inqueueClick();" checked/>
                 {% else %}

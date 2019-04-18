@@ -19,8 +19,7 @@
                 <td>姓名</td>
                 <td>性别</td>
                 <td>出生年月</td>
-                <td>籍贯</td>
-                <td>电话号码</td>
+                <td>身份证号码</td>
             </thead>
             <tbody>
                 {% for patient in patients %}
@@ -32,8 +31,7 @@
                         </td>
                         <td>{{ patient.gender }}</td>
                         <td>{{ patient.birthDate }}</td>
-                        <td>{{ patient.birthPlace }}</td>
-                        <td>{{ patient.phoneNumber }}</td>
+                        <td>{{ patient.personalID }}</td>
                     </tr>
                 {% endfor %}
             </tbody>

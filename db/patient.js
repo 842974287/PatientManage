@@ -14,8 +14,9 @@ const patientSchema = new Schema({
     photos: [String],
     inqueue: { type: Boolean, default: false },
     urgent: { type: Boolean, default: false },
-    inpatient: { type: Boolean, default: false },
-    reserveTime: Number,
+    favor: { type: Boolean, default: false },
+    inqueueDate: Number,
+    admitDate: Number,
     briefTreatments: [String],
     currentDiagnosis: [String],
     currentTreatments: [{

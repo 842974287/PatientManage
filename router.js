@@ -14,6 +14,7 @@ router.get('/', showLoginPage)
     .get('/main', showMainPage)
     .get('/allPatient', showAllPatient)
     .get('/allRecord', showAllRecord)
+    .get('/inqueueList', showInqueueList)
     .get('/courseList', showCourseList)
     .get('/userForm', showNewUserForm)
     .get('/searchByName', searchByName)
@@ -121,6 +122,18 @@ async function showAllRecord(ctx) {
     }
 }
 
+async function showInqueueList(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
+    let patients = await Patient.find({ inqueue: true });
+
+    await ctx.render('inqueueList', {
+        patients: opt.generatePatientList(patients, false),
+    });
+}
+
 async function showNewUserForm(ctx) {
     if (!ctx.session.userRole) {
         await ctx.redirect('/');
@@ -217,10 +230,15 @@ async function addNewPatient(ctx) {
 
     if (patientInfo.inqueue) {
         newPatient.inqueue = true;
+        newPatient.inqueueDate = opt.normalizeDate();
 
         if (patientInfo.urgent) {
             newPatient.urgent = true;
         }
+    }
+
+    if (patientInfo.favor) {
+        newPatient.favor = true;
     }
 
     await newPatient.save();
@@ -375,7 +393,7 @@ async function showPatientDetail(ctx) {
 
     await ctx.render('patientDetail', {
         userRole: ctx.session.userRole,
-        patient: opt.generatePatient(patient),
+        patient: opt.generatePatientDetail(patient),
         records: opt.generateRecordList(records),
     });
 }
@@ -430,14 +448,29 @@ async function modifyPatient(ctx) {
     patient.firstAttackDate = patientInfo.firstAttackDate;
 
     if (patientInfo.inqueue) {
-        patient.inqueue = true;
+        if (!patient.inqueue) {
+            patient.inqueue = true;
+            patient.inqueueDate = opt.normalizeDate();
+        }
 
         if (patientInfo.urgent) {
             patient.urgent = true;
         }
     }
+    else {
+        patient.inqueue = false;
+        patient.urgent = false;
+    }
+
+    if (patientInfo.favor) {
+        patient.favor = true;
+    }
+    else {
+        patient.favor = false;
+    }
 
     await patient.save();
+
     await ctx.redirect('./patientDetail?_id=' + patientInfo.id);
 }
 
@@ -628,6 +661,7 @@ async function admit(ctx) {
 
     patient.inqueue = false;
     patient.urgent = false;
+    patient.admitDate = opt.normalizeDate();
 
     await patient.save();
 
