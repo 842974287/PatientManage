@@ -183,9 +183,6 @@ async function searchByName(ctx) {
     if (!ctx.session.userRole) {
         ctx.redirect('/');
     }
-    else if (ctx.session.userRole == 3) {
-        ctx.redirect('/main');
-    }
 
     let patients = await Patient.find({ name: ctx.query.name }).sort('birthDate');
 
@@ -203,9 +200,6 @@ async function searchByName(ctx) {
 async function showPatientForm(ctx) {
     if (!ctx.session.userRole) {
         ctx.redirect('/');
-    }
-    else if (ctx.session.userRole == 3) {
-        ctx.redirect('/main');
     }
 
     await ctx.render('newPatientForm', {
@@ -250,9 +244,6 @@ async function showRecordForm(ctx) {
     if (!ctx.session.userRole) {
         ctx.redirect('/');
     }
-    else if (ctx.session.userRole == 3) {
-        ctx.redirect('/main');
-    }
 
     await ctx.render('newRecordForm', {
         name: ctx.query.name,
@@ -264,6 +255,10 @@ async function showRecordForm(ctx) {
 }
 
 async function addNewRecord(ctx) {
+    if (!ctx.session.userRole) {
+        ctx.redirect('/');
+    }
+
     recordInfo = ctx.request.body;
     let patientID = mongoose.Types.ObjectId(recordInfo.id);
     let patient = await Patient.findById(patientID);
@@ -353,6 +348,10 @@ async function addNewRecord(ctx) {
 }
 
 async function uploadFile(ctx) {
+    if (!ctx.session.userRole) {
+        ctx.redirect('/');
+    }
+
     const files = ctx.request.body.files.file;
     let patient = await Patient.findById(mongoose.Types.ObjectId(ctx.request.body.fields.patientID));
 
@@ -399,7 +398,7 @@ async function showPatientDetail(ctx) {
 }
 
 async function showModifyPatientForm(ctx) {
-    if (ctx.session.userRole != 1) {
+    if (ctx.session.userRole == 2) {
         await ctx.redirect('/main');
     }
 
@@ -414,7 +413,7 @@ async function showModifyPatientForm(ctx) {
 }
 
 async function showModifyRecordForm(ctx) {
-    if (ctx.session.userRole != 1) {
+    if (ctx.session.userRole == 2) {
         await ctx.redirect('/main');
     }
 
@@ -432,7 +431,7 @@ async function showModifyRecordForm(ctx) {
 }
 
 async function modifyPatient(ctx) {
-    if (ctx.session.userRole != 1) {
+    if (ctx.session.userRole == 2) {
         await ctx.redirect('/main');
     }
 
@@ -475,7 +474,7 @@ async function modifyPatient(ctx) {
 }
 
 async function modifyRecord(ctx) {
-    if (ctx.session.userRole != 1) {
+    if (ctx.session.userRole == 2) {
         await ctx.redirect('/main');
     }
 
@@ -564,7 +563,7 @@ async function modifyRecord(ctx) {
 }
 
 async function deletePatient(ctx) {
-    if (ctx.session.userRole != 1) {
+    if (ctx.session.userRole == 2) {
         await ctx.redirect('/main');
     }
 
@@ -576,7 +575,7 @@ async function deletePatient(ctx) {
 }
 
 async function deleteRecord(ctx) {
-    if (ctx.session.userRole != 1) {
+    if (ctx.session.userRole == 2) {
         await ctx.redirect('/main');
     }
 
@@ -656,6 +655,10 @@ async function playVideo(ctx) {
 }
 
 async function admit(ctx) {
+    if (!ctx.session.userRole) {
+        ctx.redirect('/');
+    }
+    
     let patientID = mongoose.Types.ObjectId(ctx.request.body.patientID);
     let patient = await Patient.findById(patientID);
 

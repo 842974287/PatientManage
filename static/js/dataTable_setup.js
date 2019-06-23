@@ -1,7 +1,7 @@
 $(document).ready( function () {
-    var role = parseInt(document.cookie.substr(5 + document.cookie.indexOf('role='), 1))
+    var role = parseInt(document.cookie.substr(5 + document.cookie.indexOf('role='), 2))
 
-    if (role == 0) {
+    if (role == -1) {
         $('#allRecord').DataTable({
             "serverSide": false,
             "dom": "Bfrtip",
