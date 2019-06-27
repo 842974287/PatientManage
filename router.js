@@ -123,7 +123,8 @@ async function showAllRecord(ctx) {
 }
 
 async function showInqueueList(ctx) {
-   let patients = await Patient.find({ inqueue: true });
+    /*
+    let patients = await Patient.find({ inqueue: true });
 
     console.log(patients.length);
 
@@ -136,6 +137,8 @@ async function showInqueueList(ctx) {
     }
 
     console.log('done');
+    */
+
     if (!ctx.session.userRole) {
         await ctx.redirect('/');
     }
