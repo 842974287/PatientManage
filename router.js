@@ -108,7 +108,7 @@ async function showAllRecord(ctx) {
         let records = await Record.find({ userID: ctx.session.userID });
 
         await ctx.render('allRecord', {
-            records: opt.generateRecordList(records),
+            records: await opt.generateRecordList(records),
             userRole: ctx.session.userRole,
         });
     }
@@ -116,7 +116,7 @@ async function showAllRecord(ctx) {
         let records = await Record.find();
 
         await ctx.render('allRecord', {
-            records: opt.generateRecordList(records),
+            records: await opt.generateRecordList(records),
             userRole: ctx.session.userRole,
         });
     }
@@ -658,7 +658,7 @@ async function admit(ctx) {
     if (!ctx.session.userRole) {
         ctx.redirect('/');
     }
-    
+
     let patientID = mongoose.Types.ObjectId(ctx.request.body.patientID);
     let patient = await Patient.findById(patientID);
 

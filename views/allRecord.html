@@ -19,6 +19,8 @@
             <thead>
                 <td>就诊时间</td>
                 <td>姓名</td>
+                <td>性别</td>
+                <td>年龄</td>
                 {% if userRole != 2 %}
                     <td>诊断医生</td>
                 {% endif %}
@@ -35,6 +37,8 @@
                                 {{ record.patientName }}
                             </a>
                         </td>
+                        <td>{{ record.gender }}</td>
+                        <td>{{ record.age }}</td>
                         {% if userRole != 2 %}
                             <td>{{ record.doctorName }}</td>
                         {% endif %}
