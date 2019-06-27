@@ -123,9 +123,9 @@ async function showAllRecord(ctx) {
 }
 
 async function showInqueueList(ctx) {
-    let patients = await Patient.find({ inqueue: true });
+   let patients = await Patient.find({ inqueue: true });
 
-    console.log(pateints.length);
+    console.log(patients.length);
 
     for (let i = 0; i < patients.length; i++) {
         let p = patients[i].toObject();
@@ -136,15 +136,14 @@ async function showInqueueList(ctx) {
     }
 
     console.log('done');
-
     if (!ctx.session.userRole) {
         await ctx.redirect('/');
     }
 
-    let patients = await Patient.find({ inqueue: true });
+    let patientss = await Patient.find({ inqueue: true });
 
     await ctx.render('inqueueList', {
-        patients: opt.generatePatientList(patients, false),
+        patients: opt.generatePatientList(patientss, false),
     });
 }
 
