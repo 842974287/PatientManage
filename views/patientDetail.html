@@ -55,7 +55,7 @@
             {% endfor %}
         </div>
     </div>
-    {% if userRole == 1 %}
+    {% if userRole != 2 %}
         <div class="form-group">
             <a class="btn btn-info" role="button" href="/modifyPatient?_id={{ patient._id }}">修改病人资料</a>
             <span>&nbsp &nbsp &nbsp &nbsp</span>

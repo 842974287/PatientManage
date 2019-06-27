@@ -449,6 +449,9 @@ async function modifyPatient(ctx) {
     if (patientInfo.inqueue) {
         if (!patient.inqueue) {
             patient.inqueue = true;
+        }
+
+        if (typeof patient.inqueueDate == "undefined") {
             patient.inqueueDate = opt.normalizeDate();
         }
 
