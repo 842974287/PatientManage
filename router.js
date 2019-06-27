@@ -123,6 +123,20 @@ async function showAllRecord(ctx) {
 }
 
 async function showInqueueList(ctx) {
+    let patients = await Patient.find({ inqueue: true });
+
+    console.log(pateints.length);
+
+    for (let i = 0; i < patients.length; i++) {
+        let p = patients[i].toObject();
+        if (typeof p.inqueueDate == 'undefined') {
+            patients[i].inqueueDate = opt.normalizeDate();
+        }
+        await patients[i].save()
+    }
+
+    console.log('done');
+
     if (!ctx.session.userRole) {
         await ctx.redirect('/');
     }
