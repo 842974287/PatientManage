@@ -393,7 +393,7 @@ async function showPatientDetail(ctx) {
     await ctx.render('patientDetail', {
         userRole: ctx.session.userRole,
         patient: opt.generatePatientDetail(patient),
-        records: opt.generateRecordList(records),
+        records: await opt.generateRecordList(records),
     });
 }
 
