@@ -53,3 +53,12 @@ function addNewTreatment(node) {
     node.parentNode.insertBefore(input, node);
     node.remove();
 }
+
+function inqueueClick() {
+    if ($("#inqueue").prop("checked")) {
+        $("#urgent").show();
+    }
+    else {
+        $("#urgent").hide();
+    }
+}

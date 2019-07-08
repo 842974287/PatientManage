@@ -28,6 +28,7 @@ router.get('/', showLoginPage)
     .get('/courseDetail', showCourseDetail)
     .get('/playVideo', playVideo)
     .get('/addCourse', addCourse)
+    .get('/inqueue', inqueue)
     .post('/login', login)
     .post('/addNewPatient', addNewPatient)
     .post('/addNewRecord', addNewRecord)
@@ -123,7 +124,7 @@ async function showAllRecord(ctx) {
 }
 
 async function showInqueueList(ctx) {
-    /*
+    /* This part of code is used to fix the database
     let patients = await Patient.find({ inqueue: true });
 
     console.log(patients.length);
@@ -147,6 +148,7 @@ async function showInqueueList(ctx) {
 
     await ctx.render('inqueueList', {
         patients: opt.generatePatientList(patientss, false),
+        userRole: ctx.session.userRole,
     });
 }
 
@@ -261,9 +263,15 @@ async function showRecordForm(ctx) {
         ctx.redirect('/');
     }
 
+    let patientID = mongoose.Types.ObjectId(ctx.query._id);
+    let patient = await Patient.findById(patientID);
+
     await ctx.render('newRecordForm', {
         name: ctx.query.name,
         id: ctx.query._id,
+        inqueue: patient.inqueue,
+        favor: patient.favor,
+        urgent: patient.urgent,
         diagnosis: configs.readDiagnosis(),
         treatment: configs.readTreatment(),
         userRole: ctx.session.userRole,
@@ -356,6 +364,30 @@ async function addNewRecord(ctx) {
     patient.briefTreatments = briefTreatments;
     patient.doctorName = newRecord.doctorName;
     patient.userID = newRecord.userID;
+
+    if (recordInfo.inqueue) {
+        if (!patient.inqueue) {
+            patient.inqueue = true;
+            patient.inqueueDate = opt.normalizeDate();
+        }
+
+        if (recordInfo.urgent) {
+            patient.urgent = true;
+        }
+        else {
+            patient.urgent = false;
+        }
+    }
+    else {
+        patient.inqueue = false;
+    }
+
+    if (recordInfo.favor) {
+        patient.favor = true;
+    }
+    else {
+        patient.favor = false;
+    }
 
     await newRecord.save();
     await patient.save();
@@ -688,6 +720,23 @@ async function admit(ctx) {
     await patient.save();
 
     ctx.body = { 'msg': 'success' };
+}
+
+async function inqueue(ctx) {
+    if (!ctx.session.userRole) {
+        ctx.redirect('/');
+    }
+
+    let patientID = mongoose.Types.ObjectId(ctx.query._id);
+    let patient = await Patient.findById(mongoose.Types.ObjectId(patientID));
+
+    if (!patient.inqueue) {
+        patient.inqueue = true;
+        patient.inqueueDate = opt.normalizeDate();
+    }
+
+    await patient.save()
+    await ctx.redirect('./patientDetail?_id=' + ctx.query._id);
 }
 
 module.exports = router;

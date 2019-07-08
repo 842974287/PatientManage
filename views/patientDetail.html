@@ -55,7 +55,12 @@
             {% endfor %}
         </div>
     </div>
-    {% if userRole != 2 %}
+    {% if !patient.inqueue %}
+    <div class="form-group">
+        <a class="btn btn-info" role="button" href="/inqueue?_id={{ patient._id }}">需要住院</a>
+    </div>
+    {% endif %}
+    {% if userRole < 2 %}
         <div class="form-group">
             <a class="btn btn-info" role="button" href="/modifyPatient?_id={{ patient._id }}">修改病人资料</a>
             <span>&nbsp &nbsp &nbsp &nbsp</span>
@@ -109,7 +114,7 @@
                         <p>备注：</p>
                         <small class="mb-1">{{ record.note }}</small>
                     {% endif %}
-                    {% if userRole == 1 %}
+                    {% if userRole < 2 %}
                         <br>
                         <div class="form-group">
                             <a class="btn btn-info" role="button" href="/modifyRecord?_id={{ record._id }}">修改门诊记录</a>
