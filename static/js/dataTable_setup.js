@@ -4,6 +4,7 @@ $(document).ready( function () {
     if (role == -1) {
         $('#allRecord').DataTable({
             "serverSide": false,
+            "deferRender": true,
             "dom": "Bfrtip",
             "buttons": [{
                     "extend": "excelHtml5",
@@ -25,6 +26,7 @@ $(document).ready( function () {
 
         $('#allPatient').DataTable({
             "serverSide": false,
+            "deferRender": true,
             "dom": "Bfrtip",
             "buttons": [{
                     "extend": "excelHtml5",
@@ -46,6 +48,7 @@ $(document).ready( function () {
     }
     else {
         $('#allRecord').DataTable({
+            "deferRender": true,
             "language": {
                 "paginate": {
                     "sNext": "下一页",
@@ -61,6 +64,7 @@ $(document).ready( function () {
         });
 
         $('#allPatient').DataTable({
+            "deferRender": true,
             "language": {
                 "paginate": {
                     "sNext": "下一页",
@@ -77,6 +81,7 @@ $(document).ready( function () {
     }
 
     $('#patientList').DataTable({
+        "deferRender": true,
         "language": {
             "paginate": {
                 "sNext": "下一页",
@@ -92,6 +97,7 @@ $(document).ready( function () {
     });
 
     $('#inqueueList').DataTable({
+        "deferRender": true,
         "language": {
             "paginate": {
                 "sNext": "下一页",
@@ -107,6 +113,7 @@ $(document).ready( function () {
     });
 
     $('#allCourse').DataTable({
+        "deferRender": true,
         "language": {
             "paginate": {
                 "sNext": "下一页",
