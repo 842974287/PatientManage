@@ -27,7 +27,6 @@ router.get('/', showLoginPage)
     .get('/deleteRecord', deleteRecord)
     .get('/courseDetail', showCourseDetail)
     .get('/playVideo', playVideo)
-    .get('/addCourse', addCourse)
     .get('/inqueue', inqueue)
     .post('/login', login)
     .post('/addNewPatient', addNewPatient)
@@ -36,6 +35,7 @@ router.get('/', showLoginPage)
     .post('/uploadFile', uploadFile)
     .post('/modifyPatient', modifyPatient)
     .post('/modifyRecord', modifyRecord)
+    .post('/addCourse', addCourse)
     .post('/admit', admit);
 
 async function showLoginPage(ctx) {
@@ -167,14 +167,13 @@ async function showCourseList(ctx) {
     if (!ctx.session.userRole) {
         await ctx.redirect('/');
     }
-    else {
-        let courses = await Course.find();
 
-        await ctx.render('courseList', {
-            courses: opt.generateCourseList(courses),
-            userRole: ctx.session.userRole,
-        });
-    }
+    let courses = await Course.find();
+
+    await ctx.render('courseList', {
+        courses: opt.generateCourseList(courses),
+        userRole: ctx.session.userRole,
+    });
 }
 
 async function addNewUser(ctx) {
@@ -227,9 +226,9 @@ async function showPatientForm(ctx) {
 }
 
 async function addNewPatient(ctx) {
-    patientInfo = ctx.request.body;
+    let patientInfo = ctx.request.body;
+    let newPatient = new Patient();
 
-    newPatient = new Patient();
     newPatient.name = patientInfo.name;
     newPatient.gender = patientInfo.gender;
     newPatient.birthDate = patientInfo.birthDate;
@@ -283,13 +282,13 @@ async function addNewRecord(ctx) {
         ctx.redirect('/');
     }
 
-    recordInfo = ctx.request.body;
+    let recordInfo = ctx.request.body;
     let patientID = mongoose.Types.ObjectId(recordInfo.id);
     let patient = await Patient.findById(patientID);
     let treatments = [];
     let briefTreatments = [];
+    let newRecord = new Record();
 
-    newRecord = new Record();
     newRecord.date = opt.normalizeDate();
     newRecord.patientID = patientID;
     newRecord.patientName = patient.name;
@@ -400,28 +399,17 @@ async function uploadFile(ctx) {
         ctx.redirect('/');
     }
 
-    const files = ctx.request.body.files.file;
+    const files = ctx.request.body.files.files;
     let patient = await Patient.findById(mongoose.Types.ObjectId(ctx.request.body.fields.patientID));
 
     if (!files.length) {
         if (files.size) {
-            let filename = Date.now().toString() + path.extname(files.name);
-            let reader = fs.createReadStream(files.path);
-            let stream = fs.createWriteStream(path.join(process.cwd(), 'photo', filename));
-            reader.pipe(stream);
-
-            patient.photos.push(filename);
+            patient.photos.push(await uploadFileHelper(files, 'photo'));
         }
     }
     else {
-        for (let key in files) {
-            let file = files[key];
-            let filename = Date.now().toString() + path.extname(file.name);
-            let reader = fs.createReadStream(file.path);
-            let stream = fs.createWriteStream(path.join(process.cwd(), 'photo', filename));
-            reader.pipe(stream);
-
-            patient.photos.push(filename);
+        for (let file of files) {
+            patient.photos.push(await uploadFileHelper(file, 'photo'));
         }
     }
 
@@ -499,7 +487,7 @@ async function modifyPatient(ctx) {
             patient.inqueue = true;
         }
 
-        if (typeof patient.inqueueDate == "undefined") {
+        if (typeof patient.inqueueDate == 'undefined') {
             patient.inqueueDate = opt.normalizeDate();
         }
 
@@ -529,7 +517,7 @@ async function modifyRecord(ctx) {
         await ctx.redirect('/main');
     }
 
-    recordInfo = ctx.request.body;
+    let recordInfo = ctx.request.body;
     let patientID = mongoose.Types.ObjectId(recordInfo.patientID);
     let patient = await Patient.findById(patientID);
     let record = await Record.findById(mongoose.Types.ObjectId(recordInfo.recordID))
@@ -632,7 +620,6 @@ async function deleteRecord(ctx) {
 
     let recordID = mongoose.Types.ObjectId(ctx.query._id);
     let recordToDelete = await Record.findByIdAndRemove(recordID);
-
     let record = await Record.findOne({ 'patientID': recordToDelete.patientID }).sort('-date');
     let patient = await Patient.findById(recordToDelete.patientID);
 
@@ -658,29 +645,78 @@ async function showCourseDetail(ctx) {
     if (!ctx.session.userRole) {
         await ctx.redirect('/');
     }
-    else {
-        let courseID = mongoose.Types.ObjectId(ctx.query._id);
-        let course = await Course.find({ _id: courseID });
 
-        await ctx.render('courseDetail', {
-            course: course[0],
-            fileName: course[0].videoList[0].fileName,
-        });
-    }
+    let courseID = mongoose.Types.ObjectId(ctx.query._id);
+    let course = await Course.find({ _id: courseID });
+
+    await ctx.render('courseDetail', {
+        course: course[0],
+        fileName: course[0].videoList[0].fileName,
+        type: path.parse(course[0].videoList[0].fileName).ext.toLowerCase() == ".mp4" ? 0 : 1,
+    });
 }
 
 async function addCourse(ctx) {
+    if (!ctx.session.userRole) {
+        ctx.redirect('/');
+    }
 
+    const content = ctx.request.body;
+    const files = content.files.files;
+    let course = new Course();
+
+    course.courseName = content.fields.courseName;
+    course.instructorName = content.fields.instructorName;
+    course.description = content.fields.description;
+
+    if (!content.fields.image) {
+        course.image = content.fields.image;
+    }
+
+    if (!files.length && files.size) {
+        course.videoList.push({
+            fileName: await uploadFileHelper(files, 'video'),
+            videoName: path.parse(files.name).name,
+        });
+    }
+    else {
+        for (let file of files) {
+            course.videoList.push({
+                fileName: await uploadFileHelper(file, 'video'),
+                videoName: path.parse(file.name).name,
+            });
+        }
+    }
+
+    await course.save();
+
+    await ctx.redirect('/courseList');
+}
+
+async function uploadFileHelper(file, folder) {
+    let filename = Date.now().toString() + path.extname(file.name);
+    let suffix = 0;
+
+    while (fs.existsSync(path.join(process.cwd(), folder, filename))) {
+        filename = Date.now().toString() + suffix.toString() + path.extname(file.name);
+        suffix += 1;
+    }
+
+    const reader = fs.createReadStream(file.path);
+    const stream = fs.createWriteStream(path.join(process.cwd(), folder, filename));
+    reader.pipe(stream);
+
+    return filename;
 }
 
 async function playVideo(ctx) {
-    const fpath = 'video/sample.mp4';
+    const fpath = 'video/' + ctx.query.fileName;
     const fstat = fs.statSync(fpath)
     const fileSize = fstat.size;
     const range = ctx.req.headers.range;
 
     if (range) {
-        const parts = range.replace(/bytes=/, "").split("-")
+        const parts = range.replace(/bytes=/, '').split('-')
         const start = parseInt(parts[0], 10)
         const end = parts[1] ? parseInt(parts[1], 10) : fileSize - 1
         const chunksize = (end - start) + 1
@@ -736,6 +772,7 @@ async function inqueue(ctx) {
     }
 
     await patient.save()
+
     await ctx.redirect('./patientDetail?_id=' + ctx.query._id);
 }
 

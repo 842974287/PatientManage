@@ -2,9 +2,13 @@
 
 {% block content %}
     <div>
-        <video id="videoPlayer" controls>
+        {% if type == 0 %}
+        <video id="videoPlayer" width="80%" height="80%" style="display: block;margin-left: auto;margin-right: auto;" controls>
             <source src="playVideo?fileName={{ fileName }}" type="video/mp4">
         </video>
+        {% else %}
+        <embed src="{{ fileName }}" width="80%" height="900px" style="display: block;margin-left: auto;margin-right: auto;"/>
+        {% endif %}
     </div>
     <div>
         <ul class="nav">

@@ -3,6 +3,7 @@
 {% block css %}
     <link rel="styleSheet" type="text/css" href="/css/jquery.dataTables.min.css">
     <link rel="styleSheet" type="text/css" href="/css/buttons.dataTables.min.css">
+    <link rel="styleSheet" type="text/css" href="/css/hidebox.css">
 {% endblock %}
 
 {% block script %}
@@ -11,12 +12,43 @@
     <script type="text/javascript" src="/js/jszip.min.js"></script>
     <script type="text/javascript" src="/js/buttons.html5.min.js"></script>
     <script type="text/javascript" src="/js/dataTable_setup.js"></script>
+    <script type="text/javascript" src="/js/hidebox.js"></script>
 {% endblock %}
 
 {% block content %}
     {% if userRole == 1 %}
     <div>
-        <a href="addCourse" role="button" class="btn btn-success">添加课程</a>
+        <button type="button" class="btn btn-success" onclick="showbox()">添加课程</button>
+    </div>
+    <div id="hidebg" onclick="hidebox()"></div>
+    <div id="hidebox">
+        <div>
+            <p class="box-head">添加课程</p>
+            <div class="hidebox-hr"><hr/></div>
+            <form action="addCourse" method="post" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="courseName">课程名称</label>
+                    <input type="text" class="form-control" name="courseName" placeholder="课程名称">
+                </div>
+                <div class="form-group">
+                    <label for="instructorName">授课人</label>
+                    <input type="text" class="form-control" name="instructorName" placeholder="授课人">
+                </div>
+                <div class="form-group">
+                    <label for="description">简介</label>
+                    <input type="text" class="form-control" name="description" placeholder="简介">
+                </div>
+                <div class="form-group">
+                    <label for="files">课程文件</label>
+                    <br>
+                    <input type="file" name="files" multiple>
+                </div>
+                <div class="boxbtn">
+                    <input class="clickbtn confirm" type="submit" value="添加" name="submit">
+                    <button class="clickbtn cancel" onclick="hidebox();">取消</button>
+                </div>
+            </form>
+        </div>
     </div>
     {% endif %}
     <div>

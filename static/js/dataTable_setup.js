@@ -5,6 +5,7 @@ $(document).ready( function () {
         $('#allRecord').DataTable({
             "serverSide": false,
             "deferRender": true,
+            "bSortClasses": false,
             "dom": "Bfrtip",
             "buttons": [{
                     "extend": "excelHtml5",
@@ -27,6 +28,7 @@ $(document).ready( function () {
         $('#allPatient').DataTable({
             "serverSide": false,
             "deferRender": true,
+            "bSortClasses": false,
             "dom": "Bfrtip",
             "buttons": [{
                     "extend": "excelHtml5",
@@ -49,6 +51,7 @@ $(document).ready( function () {
     else {
         $('#allRecord').DataTable({
             "deferRender": true,
+            "bSortClasses": false,
             "language": {
                 "paginate": {
                     "sNext": "下一页",
@@ -65,6 +68,7 @@ $(document).ready( function () {
 
         $('#allPatient').DataTable({
             "deferRender": true,
+            "bSortClasses": false,
             "language": {
                 "paginate": {
                     "sNext": "下一页",
@@ -82,6 +86,7 @@ $(document).ready( function () {
 
     $('#patientList').DataTable({
         "deferRender": true,
+        "bSortClasses": false,
         "language": {
             "paginate": {
                 "sNext": "下一页",
@@ -98,6 +103,7 @@ $(document).ready( function () {
 
     $('#inqueueList').DataTable({
         "deferRender": true,
+        "bSortClasses": false,
         "language": {
             "paginate": {
                 "sNext": "下一页",
@@ -114,6 +120,7 @@ $(document).ready( function () {
 
     $('#allCourse').DataTable({
         "deferRender": true,
+        "bSortClasses": false,
         "language": {
             "paginate": {
                 "sNext": "下一页",

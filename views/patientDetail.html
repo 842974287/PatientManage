@@ -75,7 +75,7 @@
         {% endfor %}
         <form action="/uploadFile" method="post" enctype="multipart/form-data">
             <input type="text" name="patientID" value="{{ patient._id }}" style="display: none">
-            <input type="file" name="file" multiple>
+            <input type="file" name="files" multiple>
             <input type="submit" value="上传">
         </form>
     </div>
