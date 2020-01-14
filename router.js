@@ -9,6 +9,7 @@ const User = require('./db/user');
 const Patient = require('./db/patient');
 const Record = require('./db/record');
 const Course = require('./db/course');
+const Question = require('./db/question');
 
 router.get('/', showLoginPage)
     .get('/main', showMainPage)
@@ -25,7 +26,9 @@ router.get('/', showLoginPage)
     .get('/modifyRecord', showModifyRecordForm)
     .get('/deletePatient', deletePatient)
     .get('/deleteRecord', deleteRecord)
+    .get('/deleteCourse', deleteCourse)
     .get('/courseDetail', showCourseDetail)
+    .get('/takeExam', showExamPage)
     .get('/playVideo', playVideo)
     .get('/inqueue', inqueue)
     .post('/login', login)
@@ -36,6 +39,7 @@ router.get('/', showLoginPage)
     .post('/modifyPatient', modifyPatient)
     .post('/modifyRecord', modifyRecord)
     .post('/addCourse', addCourse)
+    .post('/addQuestion', addQuestion)
     .post('/admit', admit);
 
 async function showLoginPage(ctx) {
@@ -156,27 +160,23 @@ async function showNewUserForm(ctx) {
     if (!ctx.session.userRole) {
         await ctx.redirect('/');
     }
-    else if (ctx.session.userRole > 1) {
+
+    if (ctx.session.userRole > 1) {
         await ctx.redirect('/main');
     }
 
     await ctx.render('newUserForm', { userRole: ctx.session.userRole });
 }
 
-async function showCourseList(ctx) {
+async function addNewUser(ctx) {
     if (!ctx.session.userRole) {
         await ctx.redirect('/');
     }
 
-    let courses = await Course.find();
+    if (ctx.session.userRole == 2) {
+        await ctx.redirect('/main');
+    }
 
-    await ctx.render('courseList', {
-        courses: opt.generateCourseList(courses),
-        userRole: ctx.session.userRole,
-    });
-}
-
-async function addNewUser(ctx) {
     userInfo = ctx.request.body;
 
     user = await User.findOne({ 'username': userInfo.username });
@@ -189,7 +189,7 @@ async function addNewUser(ctx) {
         newUser.role = userInfo.userRole;
         await newUser.save();
 
-        ctx.redirect('/main');
+        await ctx.redirect('/main');
     }
     else {
         await ctx.render()
@@ -198,7 +198,7 @@ async function addNewUser(ctx) {
 
 async function searchByName(ctx) {
     if (!ctx.session.userRole) {
-        ctx.redirect('/');
+        await ctx.redirect('/');
     }
 
     let patients = await Patient.find({ name: ctx.query.name }).sort('birthDate');
@@ -216,7 +216,7 @@ async function searchByName(ctx) {
 
 async function showPatientForm(ctx) {
     if (!ctx.session.userRole) {
-        ctx.redirect('/');
+        await ctx.redirect('/');
     }
 
     await ctx.render('newPatientForm', {
@@ -259,7 +259,7 @@ async function addNewPatient(ctx) {
 
 async function showRecordForm(ctx) {
     if (!ctx.session.userRole) {
-        ctx.redirect('/');
+        await ctx.redirect('/');
     }
 
     let patientID = mongoose.Types.ObjectId(ctx.query._id);
@@ -279,7 +279,7 @@ async function showRecordForm(ctx) {
 
 async function addNewRecord(ctx) {
     if (!ctx.session.userRole) {
-        ctx.redirect('/');
+        await ctx.redirect('/');
     }
 
     let recordInfo = ctx.request.body;
@@ -396,7 +396,7 @@ async function addNewRecord(ctx) {
 
 async function uploadFile(ctx) {
     if (!ctx.session.userRole) {
-        ctx.redirect('/');
+        await ctx.redirect('/');
     }
 
     const files = ctx.request.body.files.files;
@@ -607,7 +607,7 @@ async function deletePatient(ctx) {
     }
 
     let patientID = mongoose.Types.ObjectId(ctx.query._id);
-    let patientToDelete = await Patient.findByIdAndRemove(mongoose.Types.ObjectId(patientID));
+    let patientToDelete = await Patient.findByIdAndDelete(mongoose.Types.ObjectId(patientID));
     let recordsToDelete = await Record.deleteMany({ 'patientID': patientID });
 
     await ctx.redirect('/main');
@@ -619,7 +619,7 @@ async function deleteRecord(ctx) {
     }
 
     let recordID = mongoose.Types.ObjectId(ctx.query._id);
-    let recordToDelete = await Record.findByIdAndRemove(recordID);
+    let recordToDelete = await Record.findByIdAndDelete(recordID);
     let record = await Record.findOne({ 'patientID': recordToDelete.patientID }).sort('-date');
     let patient = await Patient.findById(recordToDelete.patientID);
 
@@ -637,8 +637,20 @@ async function deleteRecord(ctx) {
     }
 
     await patient.save();
-
     await ctx.redirect('/patientDetail?_id=' + patient._id.toString());
+}
+
+async function showCourseList(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
+    let courses = await Course.find();
+
+    await ctx.render('courseList', {
+        courses: opt.generateCourseList(courses),
+        userRole: ctx.session.userRole,
+    });
 }
 
 async function showCourseDetail(ctx) {
@@ -658,7 +670,11 @@ async function showCourseDetail(ctx) {
 
 async function addCourse(ctx) {
     if (!ctx.session.userRole) {
-        ctx.redirect('/');
+        await ctx.redirect('/');
+    }
+
+    if (ctx.session.userRole == 2) {
+        await ctx.redirect('/main');
     }
 
     const content = ctx.request.body;
@@ -689,6 +705,24 @@ async function addCourse(ctx) {
     }
 
     await course.save();
+    await ctx.redirect('/courseList');
+}
+
+async function deleteCourse(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
+    if (ctx.session.userRole == 2) {
+        await ctx.redirect('/main');
+    }
+
+    const courseID = mongoose.Types.ObjectId(ctx.query._id);
+    const course = await Course.findByIdAndDelete(courseID);
+
+    for (let video of course.videoList) {
+        deleteFileHelper(video.fileName, 'video');
+    }
 
     await ctx.redirect('/courseList');
 }
@@ -707,6 +741,18 @@ async function uploadFileHelper(file, folder) {
     reader.pipe(stream);
 
     return filename;
+}
+
+async function deleteFileHelper(fileName, folder) {
+    const fullFileName = path.join(process.cwd(), folder, fileName);
+
+    if (fs.existsSync(fullFileName)) {
+        fs.unlink(fullFileName, (err) => {
+            if (err) {
+                console.log(err);
+            }
+        });
+    }
 }
 
 async function playVideo(ctx) {
@@ -743,7 +789,7 @@ async function playVideo(ctx) {
 
 async function admit(ctx) {
     if (!ctx.session.userRole) {
-        ctx.redirect('/');
+        await ctx.redirect('/');
     }
 
     let patientID = mongoose.Types.ObjectId(ctx.request.body.patientID);
@@ -754,13 +800,12 @@ async function admit(ctx) {
     patient.admitDate = opt.normalizeDate();
 
     await patient.save();
-
     ctx.body = { 'msg': 'success' };
 }
 
 async function inqueue(ctx) {
     if (!ctx.session.userRole) {
-        ctx.redirect('/');
+        await ctx.redirect('/');
     }
 
     let patientID = mongoose.Types.ObjectId(ctx.query._id);
@@ -772,8 +817,54 @@ async function inqueue(ctx) {
     }
 
     await patient.save()
-
     await ctx.redirect('./patientDetail?_id=' + ctx.query._id);
+}
+
+async function showExamPage(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
+    const CourseID = mongoose.Types.ObjectId(ctx.query.courseID);
+    let questions = await Question.find({ relatedCourse: CourseID });
+
+    await ctx.render('examPage', {
+        questions: opt.generateQuestionList(questions),
+        courseID: ctx.query.courseID,
+        userRole: ctx.session.userRole,
+    });
+}
+
+async function addQuestion(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
+    if (ctx.session.userRole == 2) {
+        await ctx.redirect('/main');
+    }
+
+    const content = ctx.request.body;
+    let newQuestion = new Question();
+    let re = new RegExp("^choice_");
+
+    newQuestion.relatedCourse = mongoose.Types.ObjectId(content.courseID);
+    newQuestion.content = content.content;
+    newQuestion.answer = content.answer;
+
+    if (content.explanation != "") {
+        newQuestion.explanation = content.explanation;
+    }
+
+    for (let tmp in content) {
+        if (tmp.match(re) && content[tmp] != "") {
+            newQuestion.choices.push(content[tmp]);
+        }
+    }
+
+    await newQuestion.save();
+
+    await ctx.redirect('/takeExam?courseID=' + content.courseID);
 }
 
 module.exports = router;

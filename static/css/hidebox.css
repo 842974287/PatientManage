@@ -11,23 +11,25 @@ label {
     z-Index:2;
 }
 #hidebox {
-    position:fixed;
-    _position: absolute;
-    margin:0;
-    width:400px;
-    height:192px;
-    top:40%;
-    left:40%;
-    background-color:#fff;
-    display:none;
-    cursor:pointer;
-    z-Index:3;
+    position: absolute;
+    margin: 0;
+    width: 400px;
+    height: 192px;
+    top: 40%;
+    left: 40%;
+    background-color: #fff;
+    display: none;
+    cursor: pointer;
+    z-Index: 3;
     text-align: center;
 }
 #content {
-    text-align:center;
-    cursor:pointer;
-    z-Index:1;
+    text-align: center;
+    cursor: pointer;
+    z-Index: 1;
+}
+#ID {
+    display: none;
 }
 .box-head {
     font-size: 18px;

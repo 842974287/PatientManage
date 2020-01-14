@@ -4,12 +4,12 @@ const db = require('./db');
 const Schema = mongoose.Schema;
 
 const questionSchema = new Schema({
-    type: Number, // 1: T or F, 2: multiple choices
     content: String,
+    choices: [String],
     answer: String,
-    explaination: String,
+    explanation: { type: String, default: 'No explanation for now.' },
     relatedCourse: Schema.Types.ObjectId,
-    relatedVideo: String,
+    relatedVideo: Number,
 }, {
     versionKey: false,
 });

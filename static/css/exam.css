@@ -1,0 +1,16 @@
+.exam {
+    margin-left: 10%;
+    margin-top: 30px;
+}
+
+.q_div {
+    margin-top: 20px;
+}
+
+.submit_btn {
+    margin-top: 40px;
+}
+
+.error {
+    display: none;
+}

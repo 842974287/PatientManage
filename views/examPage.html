@@ -1,0 +1,81 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+    <link rel="styleSheet" type="text/css" href="/css/hidebox.css">
+    <link rel="styleSheet" type="text/css" href="/css/exam.css">
+{% endblock %}
+
+{% block script %}
+    <script type="text/javascript" src="/js/hidebox.js"></script>
+    <script type="text/javascript" src="/js/exam.js"></script>
+{% endblock %}
+
+{% block content %}
+    {% if userRole != 2 %}
+    <div>
+        <button type="button" class="btn btn-success" onclick="showbox()">添加题目</button>
+    </div>
+    <div id="hidebg" onclick="hidebox()"></div>
+    <div id="hidebox">
+        <div>
+            <p class="box-head">添加题目</p>
+            <div class="hidebox-hr"><hr/></div>
+            <form action="addQuestion" method="post">
+                <div class="form-group">
+                    <label for="content">题目内容</label>
+                    <input type="text" class="form-control" name="content" placeholder="题目内容">
+                </div>
+                <div class="form-group" id="choices">
+                    <div class="choice form-group">
+                        <label for="choice_1">选项1</label>
+                        <input type="text" class="form-control" name="choice_1" placeholder="选项1">
+                    </div>
+                    <div class="choice form-group">
+                        <label for="choice_2">选项2</label>
+                        <input type="text" class="form-control" name="choice_2" placeholder="选项2">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <button type="button" class="form-control" onclick="addChoice();">添加选项</button>
+                </div>
+                <div class="form-group">
+                    <label for="answer">答案</label>
+                    <input type="text" class="form-control" name="answer" placeholder="答案">
+                </div>
+                <div class="form-group">
+                    <label for="explanation">解释</label>
+                    <input type="text" class="form-control" name="explanation" placeholder="解释，可为空">
+                </div>
+                <input id="ID" type="text" name="courseID" value="{{ courseID }}">
+                <div class="boxbtn">
+                    <input id="submit" class="clickbtn confirm" type="submit" value="添加" name="submit">
+                    <button class="clickbtn cancel" onclick="hidebox();">取消</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+    <div class="exam">
+        {% for question in questions %}
+        <div class="q_div">
+            <div class="q_content">
+                <h5>题目：{{ question.content }}</h5>
+            </div>
+            <div class="q_choice">
+                {% for choice in question.choices %}
+                    <input class="ch" type="radio" name="{{ question.answer }}" value="{{ choice }}"> {{ choice }}
+                    <br>
+                {% endfor %}
+            </div>
+            <div class="error">
+                <span>正确答案：{{ question.answer }}</span>
+                <br>
+                <span>{{ question.explanation }}</span>
+            </div>
+        </div>
+        {% endfor %}
+        <div class="submit_btn">
+            <button type="button" name="button" onclick="submitExam();">提交</button>
+        </div>
+    </div>
+{% endblock %}

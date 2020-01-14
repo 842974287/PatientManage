@@ -7,7 +7,7 @@ const courseSchema = new Schema({
     courseName: String,
     instructorName: String,
     description: String,
-    image: { type: String, default: "default.jpg" },
+    image: { type: String, default: 'default.jpg' },
     videoList: [{
         _id: false,
         fileName: String,

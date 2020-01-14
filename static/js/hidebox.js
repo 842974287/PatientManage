@@ -10,8 +10,20 @@ function hidebox() {
     document.getElementById("hidebox").style.display="none";
 }
 
-function contact(){
+function contact() {
     document.getElementById("hidebg").style.display="none";
     document.getElementById("hidebox").style.display="none";
     window.open("url");
 }
+
+function addChoice() {
+    const len = $(".choice").length + 1;
+    $("#choices").append("<div class=\"choice form-group\"><label for=\"choice_" +
+    len + "\">选项" + len + "</label><input type=\"text\" class=\"form-control\" name=\"choice_" +
+    len + "\" placeholder=\"选项" + len + "\"></div>");
+}
+
+$("form").submit(() => {
+    $("#id").disable();
+    return true;
+})
