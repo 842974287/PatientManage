@@ -49,7 +49,7 @@
                 <input id="ID" type="text" name="courseID" value="{{ courseID }}">
                 <div class="boxbtn">
                     <input id="submit" class="clickbtn confirm" type="submit" value="添加" name="submit">
-                    <button class="clickbtn cancel" onclick="hidebox();">取消</button>
+                    <button type="button" class="clickbtn cancel" onclick="hidebox();">取消</button>
                 </div>
             </form>
         </div>
@@ -60,6 +60,9 @@
         <div class="q_div">
             <div class="q_content">
                 <h5>题目：{{ question.content }}</h5>
+                {% if userRole != 2 %}
+                    <a type="button" href="/deleteQuestion?q_id={{question._id}}&c_id={{question.relatedCourse}}">删除</a>
+                {% endif %}
             </div>
             <div class="q_choice">
                 {% for choice in question.choices %}

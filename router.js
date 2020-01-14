@@ -31,6 +31,7 @@ router.get('/', showLoginPage)
     .get('/takeExam', showExamPage)
     .get('/playVideo', playVideo)
     .get('/inqueue', inqueue)
+    .get('/deleteQuestion', deleteQuestion)
     .post('/login', login)
     .post('/addNewPatient', addNewPatient)
     .post('/addNewRecord', addNewRecord)
@@ -724,6 +725,8 @@ async function deleteCourse(ctx) {
         deleteFileHelper(video.fileName, 'video');
     }
 
+    await Question.deleteMany({ relatedCourse: courseID });
+
     await ctx.redirect('/courseList');
 }
 
@@ -809,7 +812,7 @@ async function inqueue(ctx) {
     }
 
     let patientID = mongoose.Types.ObjectId(ctx.query._id);
-    let patient = await Patient.findById(mongoose.Types.ObjectId(patientID));
+    let patient = await Patient.findById(patientID);
 
     if (!patient.inqueue) {
         patient.inqueue = true;
@@ -865,6 +868,20 @@ async function addQuestion(ctx) {
     await newQuestion.save();
 
     await ctx.redirect('/takeExam?courseID=' + content.courseID);
+}
+
+async function deleteQuestion(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
+    if (ctx.session.userRole == 2) {
+        await ctx.redirect('/main');
+    }
+
+    await Question.findByIdAndDelete(mongoose.Types.ObjectId(ctx.query.q_id));
+
+    await ctx.redirect('/takeExam?courseID=' + ctx.query.c_id);
 }
 
 module.exports = router;

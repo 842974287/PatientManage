@@ -13,8 +13,6 @@ label {
 #hidebox {
     position: absolute;
     margin: 0;
-    width: 400px;
-    height: 192px;
     top: 40%;
     left: 40%;
     background-color: #fff;
