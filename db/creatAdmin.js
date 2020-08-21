@@ -1,7 +1,6 @@
 const User = require('./user');
 
 let admin = new User();
-let normal = new User();
 
 admin.username = 'qwe';
 admin.password = '12345';

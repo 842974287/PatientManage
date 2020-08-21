@@ -32,6 +32,7 @@ router.get('/', showLoginPage)
     .get('/playVideo', playVideo)
     .get('/inqueue', inqueue)
     .get('/deleteQuestion', deleteQuestion)
+    .get('/infoPage', showUserInfo)
     .post('/login', login)
     .post('/addNewPatient', addNewPatient)
     .post('/addNewRecord', addNewRecord)
@@ -41,7 +42,8 @@ router.get('/', showLoginPage)
     .post('/modifyRecord', modifyRecord)
     .post('/addCourse', addCourse)
     .post('/addQuestion', addQuestion)
-    .post('/admit', admit);
+    .post('/admit', admit)
+    .post('/updateUserInfo', updateUserInfo);
 
 async function showLoginPage(ctx) {
     await ctx.render('login');
@@ -882,6 +884,40 @@ async function deleteQuestion(ctx) {
     await Question.findByIdAndDelete(mongoose.Types.ObjectId(ctx.query.q_id));
 
     await ctx.redirect('/takeExam?courseID=' + ctx.query.c_id);
+}
+
+async function showUserInfo(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
+    let user = await User.findOne({ _id : ctx.session.userID });
+
+    await ctx.render('userInfoPage', {
+        username: user.username,
+        realName: user.realName,
+        userRole: ctx.session.userRole,
+    });
+}
+
+async function updateUserInfo(ctx) {
+    if (!ctx.session.userRole) {
+        await ctx.redirect('/');
+    }
+
+    let user = await User.findOne({ _id : ctx.session.userID });
+
+    if (ctx.request.body.username == user.username) {
+        user.realName = ctx.request.body.realName;
+
+        if (ctx.request.body.password != '') {
+            user.password = ctx.request.body.password;
+        }
+
+        await user.save();
+    }
+
+    await ctx.redirect('/infoPage');
 }
 
 module.exports = router;

@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 order-md-1">
+                <h4 class="mb-3">个人资料</h4>
+                <form action="/updateUserInfo" method="post">
+                    <div class="mb-3">
+                      <label for="username">用户名<span class="text-muted">（无法修改）</span>：{{ username }}</label>
+                      <input type="hidden" name="username" value="{{ username }}">
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="realName">姓名：</label>
+                      <input type="text" class="form-control" name="realName" value="{{ realName }}">
+                    </div>
+
+                    <div class="mb-3">
+                      <label for="address">密码：<span class="text-muted">（留空如果不想修改）</span></label>
+                      <input type="password" class="form-control" name="password">
+                    </div>
+
+                    <hr class="mb-4">
+                    <button class="btn btn-primary btn-lg btn-block" type="submit">确认修改</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

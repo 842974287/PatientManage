@@ -12,48 +12,48 @@
 
 {% block content %}
     {% if userRole != 2 %}
-    <div>
-        <button type="button" class="btn btn-success" onclick="showbox()">添加题目</button>
-    </div>
-    <div id="hidebg" onclick="hidebox()"></div>
-    <div id="hidebox">
         <div>
-            <p class="box-head">添加题目</p>
-            <div class="hidebox-hr"><hr/></div>
-            <form action="addQuestion" method="post">
-                <div class="form-group">
-                    <label for="content">题目内容</label>
-                    <input type="text" class="form-control" name="content" placeholder="题目内容">
-                </div>
-                <div class="form-group" id="choices">
-                    <div class="choice form-group">
-                        <label for="choice_1">选项1</label>
-                        <input type="text" class="form-control" name="choice_1" placeholder="选项1">
-                    </div>
-                    <div class="choice form-group">
-                        <label for="choice_2">选项2</label>
-                        <input type="text" class="form-control" name="choice_2" placeholder="选项2">
-                    </div>
-                </div>
-                <div class="form-group">
-                    <button type="button" class="form-control" onclick="addChoice();">添加选项</button>
-                </div>
-                <div class="form-group">
-                    <label for="answer">答案</label>
-                    <input type="text" class="form-control" name="answer" placeholder="答案">
-                </div>
-                <div class="form-group">
-                    <label for="explanation">解释</label>
-                    <input type="text" class="form-control" name="explanation" placeholder="解释，可为空">
-                </div>
-                <input id="ID" type="text" name="courseID" value="{{ courseID }}">
-                <div class="boxbtn">
-                    <input id="submit" class="clickbtn confirm" type="submit" value="添加" name="submit">
-                    <button type="button" class="clickbtn cancel" onclick="hidebox();">取消</button>
-                </div>
-            </form>
+            <button type="button" class="btn btn-success" onclick="showbox()">添加题目</button>
         </div>
-    </div>
+        <div id="hidebg" onclick="hidebox()"></div>
+        <div id="hidebox">
+            <div>
+                <p class="box-head">添加题目</p>
+                <div class="hidebox-hr"><hr/></div>
+                <form action="addQuestion" method="post">
+                    <div class="form-group">
+                        <label for="content">题目内容</label>
+                        <input type="text" class="form-control" name="content" placeholder="题目内容">
+                    </div>
+                    <div class="form-group" id="choices">
+                        <div class="choice form-group">
+                            <label for="choice_1">选项1</label>
+                            <input type="text" class="form-control" name="choice_1" placeholder="选项1">
+                        </div>
+                        <div class="choice form-group">
+                            <label for="choice_2">选项2</label>
+                            <input type="text" class="form-control" name="choice_2" placeholder="选项2">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="form-control" onclick="addChoice();">添加选项</button>
+                    </div>
+                    <div class="form-group">
+                        <label for="answer">答案</label>
+                        <input type="text" class="form-control" name="answer" placeholder="答案">
+                    </div>
+                    <div class="form-group">
+                        <label for="explanation">解释</label>
+                        <input type="text" class="form-control" name="explanation" placeholder="解释，可为空">
+                    </div>
+                    <input id="ID" type="text" name="courseID" value="{{ courseID }}">
+                    <div class="boxbtn">
+                        <input id="submit" class="clickbtn confirm" type="submit" value="添加" name="submit">
+                        <button type="button" class="clickbtn cancel" onclick="hidebox();">取消</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     {% endif %}
     <div class="exam">
         {% for question in questions %}
