@@ -151,10 +151,10 @@ async function showInqueueList(ctx) {
         await ctx.redirect('/');
     }
 
-    let patientss = await Patient.find({ inqueue: true });
+    let patients = await Patient.find({ inqueue: true, userID: ctx.session.userID });
 
     await ctx.render('inqueueList', {
-        patients: opt.generatePatientList(patientss, false),
+        patients: opt.generatePatientList(patients, false),
         userRole: ctx.session.userRole,
     });
 }
@@ -180,9 +180,8 @@ async function addNewUser(ctx) {
         await ctx.redirect('/main');
     }
 
-    userInfo = ctx.request.body;
-
-    user = await User.findOne({ 'username': userInfo.username });
+    let userInfo = ctx.request.body;
+    let user = await User.findOne({ 'username': userInfo.username });
 
     if (!user) {
         newUser = new User();
@@ -195,7 +194,7 @@ async function addNewUser(ctx) {
         await ctx.redirect('/main');
     }
     else {
-        await ctx.render()
+        ctx.body = { 'msg': '用户已存在' };
     }
 }
 
