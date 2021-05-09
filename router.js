@@ -50,8 +50,8 @@ async function showLoginPage(ctx) {
 }
 
 async function login(ctx) {
-    userInfo = ctx.request.body;
-    user = await User.findOne({ 'username': userInfo.username });
+    const userInfo = ctx.request.body;
+    const user = await User.findOne({ 'username': userInfo.username });
 
     if (user) {
         if (user.password === userInfo.password) {
@@ -184,7 +184,7 @@ async function addNewUser(ctx) {
     let user = await User.findOne({ 'username': userInfo.username });
 
     if (!user) {
-        newUser = new User();
+        let newUser = new User();
         newUser.username = userInfo.username;
         newUser.password = userInfo.password;
         newUser.realName = userInfo.realName;
@@ -609,8 +609,8 @@ async function deletePatient(ctx) {
     }
 
     let patientID = mongoose.Types.ObjectId(ctx.query._id);
-    let patientToDelete = await Patient.findByIdAndDelete(mongoose.Types.ObjectId(patientID));
-    let recordsToDelete = await Record.deleteMany({ 'patientID': patientID });
+    await Patient.findByIdAndDelete(mongoose.Types.ObjectId(patientID));
+    await Record.deleteMany({ 'patientID': patientID });
 
     await ctx.redirect('/main');
 }
@@ -781,7 +781,7 @@ async function playVideo(ctx) {
         ctx.body = file
     }
     else {
-        const head = {
+        ctx.head = {
             'Content-Length': fileSize,
             'Content-Type': 'video/mp4',
         }
