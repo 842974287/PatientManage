@@ -1,22 +1,23 @@
-$(document).ready(function () {
-
-});
-
 function addDiagnosis() {
-    var div = $(".diagnosis-default")[0].cloneNode(true);
+    var div = $(".diagnosis-default").clone(true, true);
+    div[0].style.display = "flex";
+    div[0].classList.remove("diagnosis-default");
+    div[0].classList.add("diagnosis");
 
-    div.style.display = "flex";
-    div.classList.remove("diagnosis-default");
-    div.classList.add("diagnosis");
+    var select = div.find("select");
+    select.selectpicker();
 
-    $("form")[0].insertBefore(div, $(".addDiagnosis")[0]);
+    $("form")[0].insertBefore(div[0], $(".addDiagnosis")[0]);
 }
 
 function addTreatment() {
-    var div = $(".treatment-default").clone(true);
+    var div = $(".treatment-default").clone(true, true);
+    div[0].style.display = "flex";
+    div[0].classList.remove("treatment-default");
+    div[0].classList.add("treatment");
 
-    div.css("display", "flex");
-    div.attr("class", "treatment input-group-prepend");
+    var select = div.find("select");
+    select.selectpicker();
 
     $(".addTreatment").before(div);
 }
@@ -33,8 +34,8 @@ function addNewDiagnosis(node) {
     var input = document.createElement("INPUT");
     input.name = "newDiagnosis";
 
-    node.parentNode.insertBefore(input, node);
-    node.remove();
+    node.parentNode.parentNode.insertBefore(input, node.parentNode);
+    node.parentNode.remove();
 }
 
 function addNewTreatment(node) {
@@ -45,13 +46,13 @@ function addNewTreatment(node) {
     var input = document.createElement("INPUT");
     input.name = "newTreatments";
 
-    var inputs = node.parentNode.getElementsByTagName("input");
+    var inputs = node.parentNode.parentNode.getElementsByTagName("input");
     inputs[0].name = "newDay";
     inputs[1].name = "newTime";
     inputs[2].name = "newAmount";
 
-    node.parentNode.insertBefore(input, node);
-    node.remove();
+    node.parentNode.parentNode.insertBefore(input, node.parentNode);
+    node.parentNode.remove();
 }
 
 function inqueueClick() {

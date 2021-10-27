@@ -1,6 +1,11 @@
 {% extends 'layout.html' %}
 
+{% block css %}
+    <link rel="styleSheet" type="text/css" href="/css/bootstrap-select.min.css">
+{% endblock %}
+
 {% block script %}
+    <script type="text/javascript" src="/js/bootstrap-select.min.js"></script>
     <script type="text/javascript" src="/js/recordForm.js"></script>
 {% endblock %}
 
@@ -13,14 +18,13 @@
         <input name="id" value="{{ id }}" style="display: none"/>
         <div class="diagnosis input-group-prepend">
             <label class="col-sm-2 control-label">诊断：</label>
-            <select class="custom-select" name="diagnosis" onchange="addNewDiagnosis(this)">
+            <select class="selectpicker" data-live-search="true" name="diagnosis" onchange="addNewDiagnosis(this)">
                 <option value="不明">不明</option>
                 {% for d in diagnosis %}
                 <option value="{{ d }}">{{ d }}</option>
                 {% endfor %}
                 <option value="addNew">添加新诊断</option>
             </select>
-            <button class="btn btn-danger" type="button" style="visibility: hidden">删除</button>
         </div>
         <div class="addDiagnosis form-group">
             <button class="btn btn-success" type="button" onclick="addDiagnosis()">添加诊断</button>
@@ -69,9 +73,9 @@
             <input class="btn btn-primary" type="submit" value="提交"/>
         </div>
     </form>
-    <div class="diagnosis-default" style="display: none">
+    <div class="diagnosis-default input-group-prepend" style="display: none;">
         <label class="col-sm-2 control-label">诊断：</label>
-        <select class="custom-select" name="diagnosis" onchange="addNewDiagnosis(this)">
+        <select class="select" name="diagnosis" data-live-search="true" onchange="addNewDiagnosis(this)">
             <option value="不明">不明</option>
             {% for d in diagnosis %}
             <option value="{{ d }}">{{ d }}</option>
@@ -80,9 +84,9 @@
         </select>
         <button class="btn btn-danger" type="button" onclick="deleteDiv(this)">删除</button>
     </div>
-    <div class="treatment-default" style="display: none">
+    <div class="treatment-default input-group-prepend" style="display: none;">
         <label class="col-sm-2 control-label">用药：</label>
-        <select class="custom-select" name="treatments" onchange="addNewTreatment(this)">
+        <select class="select" name="treatments" data-live-search="true" onchange="addNewTreatment(this)">
             {% for t in treatment %}
             <option value="{{ t }}">{{ t }}</option>
             {% endfor %}

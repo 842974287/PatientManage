@@ -303,6 +303,10 @@ async function addNewRecord(ctx) {
             recordInfo.newDiagnosis = recordInfo.newDiagnosis.split(' ');
         }
 
+        recordInfo.newDiagnosis = recordInfo.newDiagnosis.filter(function(value, index, arr){ 
+            return value.replace(/\s/g, '').length;
+        });
+
         configs.addDiagnosis(recordInfo.newDiagnosis);
 
         if (recordInfo.hasOwnProperty('diagnosis')) {
@@ -324,6 +328,10 @@ async function addNewRecord(ctx) {
         if (typeof recordInfo.newTreatments == 'string') {
             recordInfo.newTreatments = recordInfo.newTreatments.split(' ');
         }
+
+        recordInfo.newTreatments = recordInfo.newTreatments.filter(function(value, index, arr){ 
+            return value.replace(/\s/g, '').length;
+        });
 
         configs.addTreatment(recordInfo.newTreatments);
         briefTreatments = briefTreatments.concat(recordInfo.newTreatments);
@@ -532,6 +540,10 @@ async function modifyRecord(ctx) {
             recordInfo.newDiagnosis = recordInfo.newDiagnosis.split(' ');
         }
 
+        recordInfo.newDiagnosis = recordInfo.newDiagnosis.filter(function(value, index, arr){ 
+            return value.replace(/\s/g, '').length;
+        });
+
         configs.addDiagnosis(recordInfo.newDiagnosis);
 
         if (recordInfo.hasOwnProperty('diagnosis')) {
@@ -552,6 +564,10 @@ async function modifyRecord(ctx) {
         if (typeof recordInfo.newTreatments == 'string') {
             recordInfo.newTreatments = recordInfo.newTreatments.split(' ');
         }
+
+        recordInfo.newTreatments = recordInfo.newTreatments.filter(function(value, index, arr){ 
+            return value.replace(/\s/g, '').length;
+        });
 
         configs.addTreatment(recordInfo.newTreatments);
         briefTreatments = briefTreatments.concat(recordInfo.newTreatments);
